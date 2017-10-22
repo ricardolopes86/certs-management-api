@@ -2,8 +2,138 @@
 import sqlite3
 import json
 from flask import Flask, jsonify, g, request, abort
+from flask_sqlalchemy import Model, SQLAlchemy
+import datetime
 
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///certificates.db'
+app.config['SQLALCHEMY_ECHO'] = True
+
+
+db = SQLAlchemy(app)
+
+class Certificates(db.Model):
+    __tablename__ = 'certificates'
+    id = db.Column(db.Integer, primary_key=True)
+    completed = db.Column(db.String(255))
+    worker = db.Column(db.String(255))
+    team = db.Column(db.String(255))
+    has_to_be_replaced_before = db.Column(db.Date()) 
+    expiration_date = db.Column(db.Date())
+    ticket_number = db.Column(db.String(255))
+    certificate = db.Column(db.String(255))
+    server_name = db.Column(db.String(255))
+    web_type = db.Column(db.String(255))
+    type = db.Column(db.String(255))
+    mail_to_co = db.Column(db.Date())
+    csr = db.Column(db.Date())
+    answer_co = db.Column(db.Date())
+    order_certificate = db.Column(db.Date())
+    delivery_from_siemens = db.Column(db.Date())
+    p12_and_zip = db.Column(db.Date())
+    moved_to_server = db.Column(db.Date())
+    implemented = db.Column(db.Date())
+    deleted_gm4web = db.Column(db.Date())
+    evidence_in_ticket = db.Column(db.Date())
+    notes = db.Column(db.Text)
+
+    def __init__(self,id,completed,worker,team,has_to_be_replaced_before,expiration_date,ticket_number,certificate,server_name,web_type,type,mail_to_co,csr,answer_co,order_certificate,delivery_from_siemens,p12_and_zip,moved_to_server,implemented,deleted_gm4web,evidence_in_ticket,notes):
+        if has_to_be_replaced_before != '':
+            has_to_be_replaced_before = has_to_be_replaced_before.split('-')
+            has_to_be_replaced_before = datetime.date(int(has_to_be_replaced_before[0]),int(has_to_be_replaced_before[1]),int(has_to_be_replaced_before[2]))
+        else:
+            has_to_be_replaced_before = None
+
+        if expiration_date != '':
+            expiration_date = expiration_date.split('-') 
+            expiration_date = datetime.date(int(expiration_date[0]),int(expiration_date[1]),int(expiration_date[2]))
+        else:
+            expiration_date = None
+
+        if mail_to_co != '':
+            mail_to_co = mail_to_co.split('-')
+            mail_to_co =  datetime.date(int(mail_to_co[0]),int(mail_to_co[1]),int(mail_to_co[2]))
+        else:
+            mail_to_co = None
+            
+        if csr != '':
+            csr = csr.split('-')
+            csr = datetime.date(int(csr[0]),int(csr[1]),int(csr[2]))
+        else:
+            csr = None
+
+        if answer_co != '':
+            answer_co = answer_co.split('-')
+            answer_co = datetime.date(int(answer_co[0]),int(answer_co[1]),int(answer_co[2]))
+        else:
+            answer_co = None
+
+        if order_certificate != '':
+            order_certificate = order_certificate.split('-')
+            order_certificate = datetime.date(int(order_certificate[0]),int(order_certificate[1]),int(order_certificate[2]))
+        else:
+            order_certificate = None
+
+        if delivery_from_siemens != '':
+            delivery_from_siemens = delivery_from_siemens.split('-')
+            delivery_from_siemens =  datetime.date(int(delivery_from_siemens[0]),int(delivery_from_siemens[1]),int(delivery_from_siemens[2]))
+        else:
+            delivery_from_siemens = None
+
+        if p12_and_zip != '':
+            p12_and_zip = p12_and_zip.split('-')
+            p12_and_zip =  datetime.date(int(p12_and_zip[0]),int(p12_and_zip[1]),int(p12_and_zip[2]))
+        else:
+            p12_and_zip = None
+
+        if moved_to_server != '':
+            moved_to_server = moved_to_server.split('-')
+            moved_to_server =  datetime.date(int(moved_to_server[0]),int(moved_to_server[1]),int(moved_to_server[2]))
+        else:
+            moved_to_server = None
+
+        if implemented != '':
+            implemented = implemented.split('-')
+            implemented =  datetime.date(int(implemented[0]),int(implemented[1]),int(implemented[2]))
+        else:
+            implemented = None
+
+        if deleted_gm4web != '':
+            deleted_gm4web = deleted_gm4web.split('-')
+            deleted_gm4web =  datetime.date(int(deleted_gm4web[0]),int(deleted_gm4web[1]),int(deleted_gm4web[2]))
+        else:
+            deleted_gm4web = None
+
+        if evidence_in_ticket != '':
+            evidence_in_ticket = evidence_in_ticket.split('-')
+            evidence_in_ticket =  datetime.date(int(evidence_in_ticket[0]),int(evidence_in_ticket[1]),int(evidence_in_ticket[2]))
+        else:
+            evidence_in_ticket = None
+
+        self.id = id
+        self.completed = completed
+        self.worker = worker
+        self.team = team
+        self.has_to_be_replaced_before = has_to_be_replaced_before
+        self.expiration_date = expiration_date
+        self.ticket_number = ticket_number
+        self.certificate = certificate
+        self.server_name = server_name
+        self.web_type = web_type
+        self.type = type
+        self.mail_to_co = mail_to_co
+        self.csr = csr
+        self.answer_co = answer_co
+        self.order_certificate = order_certificate
+        self.delivery_from_siemens = delivery_from_siemens
+        self.p12_and_zip = p12_and_zip
+        self.moved_to_server = moved_to_server
+        self.implemented = implemented
+        self.deleted_gm4web = deleted_gm4web
+        self.evidence_in_ticket = evidence_in_ticket
+        self.notes = notes
+
 
 @app.errorhandler(404)
 def not_found(error):
@@ -113,18 +243,9 @@ def query_db_all():
     return result
 
 def insert_db(data):
-    DATABASE = 'certificates.db'
-    with sqlite3.connect(DATABASE) as con:
-        cur = con.cursor()
-        parameters = []
-        for key, value in data.items():
-            parameters.append(value)
-            
-        #sql = '''INSERT INTO certificates VALUES ({1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22}) '''.format(1=parameters[0],2=parameters[1],3=parameters[2],4=parameters[3],5=parameters[4],6=parameters[5],7=parameters[6],8=parameters[7],9=parameters[8],10=parameters[9],11=parameters[10],12=parameters[11],13=parameters[12],14=parameters[13],15=parameters[14],16=parameters[15],17=parameters[16],18=parameters[17],19=parameters[18],20=parameters[19],21=parameters[20],22=parameters[21])
-
-        cur.execute('''INSERT INTO certificates VALUES (?) ''', *parameters)
-
-        con.commit()
+    certificate = Certificates(data['id'],data['completed'],data['worker'],data['team'],data['has_to_be_replaced_before'],data['expiration_date'],data['ticket_number'],data['certificate'],data['server_name'],data['web_type'],data['type'],data['mail_to_co'],data['csr'],data['answer_co'],data['order_certificate'],data['delivery_from_siemens'],data['p12_and_zip'],data['moved_to_server'],data['implemented'],data['deleted_gm4web'],data['evidence_in_ticket'],data['notes'])
+    db.session.add(certificate)
+    db.session.commit()
 
 @app.route('/api/certificate', methods=['POST'])
 def create_task():
