@@ -134,6 +134,28 @@ class Certificates(db.Model):
         self.evidence_in_ticket = evidence_in_ticket
         self.notes = notes
 
+def month_string_to_number(string):
+    m = {
+            'jan': '1',
+            'feb': '2',
+            'mar': '3',
+            'apr': '4',
+            'may': '5',
+            'jun': '6',
+            'jul': '7',
+            'aug': '8',
+            'sep': '9',
+            'oct': '10',
+            'nov': '11',
+            'dec': '12'
+        }
+    s = string.strip()[:3].lower()
+
+    try:
+        out = m[s]
+        return out
+    except:
+        raise ValueError('Not a month')
 
 @app.errorhandler(404)
 def not_found(error):
@@ -185,21 +207,26 @@ def add_new():
 
 @app.route('/add/new/parse', methods=['POST'])
 def parse_new():
-    text = request.form
-    text =  text['text_from_mail'].split(' ')
-    cert_type = text[9][1:-1]
-    cert_cn = text[12]
-    cert_exp_month = text[16]
-    cert_exp_day = text[17][:-1]
-    cert_exp_year = text[18]
-    data = {}
-    data['cn_type'] = cert_type
-    data['cn'] = cert_cn
-    data['expiration_day'] = cert_exp_day
-    data['expiration_month'] = cert_exp_month
-    data['expiration_year'] = cert_exp_year
-    print data
-    return render_template('parse.html', data=data)
+    text = request.form['text_from_mail']
+    if text == '' or text == ' ' or text == None:
+        return render_template('parse.html')
+    else:
+        text =  text.split(' ')
+        if text[0] != 'Our':
+            return render_template('parse.html')
+        else:
+            cert_type = text[9][1:-1]
+            cert_cn = text[12]
+            cert_exp_month = text[16]
+            cert_exp_day = text[17][:-1]
+            cert_exp_year = text[18]
+            exp_date = cert_exp_year+"-"+month_string_to_number(cert_exp_month)+"-"+cert_exp_day
+            data = {}
+            data['cn_type'] = cert_type
+            data['cn'] = cert_cn
+            data['expiration_date'] = exp_date
+            return render_template('parse.html', data=data)
+        
 
 def query_like_db(field, data):
     field = field.lower()
@@ -246,7 +273,80 @@ def insert_db(data):
     db.session.add(certificate)
     db.session.commit()
 
-@app.route('/api/certificate', methods=['POST'])
+@app.route('/add/new/certificate/save', methods=['POST'])
+def save_new_certificate():
+    completed = request.form['completed']
+    worker =  request.form['worker']
+    team =  request.form['team']
+    has_to_be_replaced_before = request.form['has_to_be_replaced_before']
+    expiration_date = request.form['expiration_date']
+    ticket_number = request.form['ticket_number']
+    certificate = request.form['cn']
+    server_name = request.form['server_name']
+    web_type = request.form['web_type']
+    type = request.form['type']
+    mail_to_co = request.form['mail_to_co']
+    csr = request.form['csr']
+    answer_co = request.form['answer_co']
+    order_certificate = request.form['order_certificate']
+    delivery_from_siemens = request.form['delivery_from_siemens']
+    p12_and_zip = request.form['p12_and_zip']
+    moved_to_server = request.form['moved_to_server']
+    implemented = request.form['implemented']
+    deleted_gm4web = request.form['deleted_gm4web']
+    evidence_in_ticket = request.form['evidence_in_ticket']
+    notes = request.form['notes']
+
+    print completed 
+    print worker 
+    print team 
+    print has_to_be_replaced_before 
+    print expiration_date 
+    print ticket_number 
+    print certificate 
+    print server_name 
+    print web_type 
+    print type
+    print mail_to_co 
+    print csr 
+    print answer_co 
+    print order_certificate 
+    print delivery_from_siemens 
+    print p12_and_zip 
+    print moved_to_server 
+    print implemented
+    print deleted_gm4web 
+    print evidence_in_ticket
+    print notes
+
+    obj = db.session.query(Certificates).order_by(Certificates.id.desc()).first()
+    id = obj.id+1
+    certificate = Certificates(id,
+        completed=completed,
+        worker=worker,
+        team=team,
+        has_to_be_replaced_before=has_to_be_replaced_before,
+        expiration_date=expiration_date,
+        ticket_number=ticket_number,
+        certificate=certificate,
+        server_name=server_name,
+        web_type=web_type,
+        type=type,
+        mail_to_co=mail_to_co,
+        csr=csr,
+        answer_co=answer_co,
+        order_certificate=order_certificate,
+        delivery_from_siemens=delivery_from_siemens,
+        p12_and_zip=p12_and_zip,
+        moved_to_server=moved_to_server,
+        implemented=implemented,
+        deleted_gm4web=deleted_gm4web,
+        evidence_in_ticket=evidence_in_ticket,
+        notes=notes)
+    db.session.add(certificate)
+    db.session.commit()
+
+@app.route('/add/new/certificate', methods=['POST'])
 def create_task():
     if not request.json:
         abort(400)

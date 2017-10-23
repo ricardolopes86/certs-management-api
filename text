@@ -1,0 +1,25 @@
+Our record indicates that your Trust Center Server ID (TCID) certificate for monitor.eps.siemens.com will expire on Oct 30, 2017 9:20:59 AM. 
+
+id,
+completed,
+worker,
+team,
+has_to_be_replaced_before,
+expiration_date,
+
+ticket_number,
+certificate,
+server_name,
+web_type,
+type,
+mail_to_co,
+csr,
+answer_co,
+order_certificate,
+delivery_from_siemens,
+p12_and_zip,
+moved_to_server,
+implemented,
+deleted_gm4web,
+evidence_in_ticket,
+notes

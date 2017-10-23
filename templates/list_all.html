@@ -72,6 +72,7 @@
             <tbody>
                 {% for item in result %}
                 <tr>
+                  <input type="hidden" value="{{item.id}}" name="id">
                     <td style="white-space: nowrap;">
                         <a href="#" class="fa fa-pencil-square-o" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="Edit"></a> |
                         <a href="#" class="fa fa-trash-o" aria-hidden="true" data-toggle="tooltip" data-placement="top"
