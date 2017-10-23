@@ -1,4 +1,4 @@
-#!flask/bin/python
+
 import sqlite3
 import json
 from flask import Flask, jsonify, g, request, abort
@@ -139,31 +139,6 @@ class Certificates(db.Model):
 def not_found(error):
     return jsonify({'error': 'Not found'}, 404)
 
-    #columns = [
-    #           'id', 
-    #           'completed', 
-    #           'worker', 
-    #           'team', 
-    #           'has_to_be_replaced_before', 
-    #           'expiration_date',
-    #           'ticket_number',
-    #           'certificate',
-    #           'server_name',
-    #           'web_type',
-    #           'type',
-    #           'mail_to_co',
-    #           'csr',
-    #           'answer_co',
-    #           'order_certificate',
-    #           'delivery_from_siemens',
-    #           'p12_and_zip',
-    #           'moved_to_server',
-    #           'implemented',
-    #           'deleted_gm4web',
-    #           'evidence_in_ticket',
-    #           'notes'
-    # ]
-
 def create_table():
     try:
         with sqlite3.connect('certificates.db') as con:
@@ -199,8 +174,11 @@ def create_table():
     finally:
         con.close()
 
-print "call create table"
 create_table()
+
+@app.route('/add/new', methods=['GET'])
+def add_new():
+    return 
 
 def query_like_db(field, data):
     field = field.lower()
