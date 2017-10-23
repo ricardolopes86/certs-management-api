@@ -1,7 +1,7 @@
 
 import sqlite3
 import json
-from flask import Flask, jsonify, g, request, abort
+from flask import Flask, jsonify, g, request, abort, render_template
 from flask_sqlalchemy import Model, SQLAlchemy
 import datetime
 
@@ -137,7 +137,7 @@ class Certificates(db.Model):
 
 @app.errorhandler(404)
 def not_found(error):
-    return jsonify({'error': 'Not found'}, 404)
+    return render_template('error.html')
 
 def create_table():
     try:
@@ -175,10 +175,31 @@ def create_table():
         con.close()
 
 create_table()
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
 
 @app.route('/add/new', methods=['GET'])
 def add_new():
-    return 
+    return render_template('new.html')
+
+@app.route('/add/new/parse', methods=['POST'])
+def parse_new():
+    text = request.form
+    text =  text['text_from_mail'].split(' ')
+    cert_type = text[9][1:-1]
+    cert_cn = text[12]
+    cert_exp_month = text[16]
+    cert_exp_day = text[17][:-1]
+    cert_exp_year = text[18]
+    data = {}
+    data['cn_type'] = cert_type
+    data['cn'] = cert_cn
+    data['expiration_day'] = cert_exp_day
+    data['expiration_month'] = cert_exp_month
+    data['expiration_year'] = cert_exp_year
+    print data
+    return render_template('parse.html', data=data)
 
 def query_like_db(field, data):
     field = field.lower()
@@ -233,9 +254,10 @@ def create_task():
     insert_db(content)
     return jsonify(content)
 
-@app.route('/api/all', methods=['GET'])
-def index():
-    return jsonify(query_db_all())
+@app.route('/list/all', methods=['GET'])
+def list_all_certs():
+    result = query_db_all()
+    return render_template('list_all.html',result=db.session.query(Certificates).all())
 
 @app.route('/api/worker/<string:worker>', methods=['GET'])
 def get_task_by_worker(worker):
