@@ -39,73 +39,73 @@ class Certificates(db.Model):
     notes = db.Column(db.Text)
 
     def __init__(self,id,completed,worker,team,has_to_be_replaced_before,expiration_date,ticket_number,certificate,server_name,web_type,type,mail_to_co,csr,answer_co,order_certificate,delivery_from_siemens,p12_and_zip,moved_to_server,implemented,deleted_gm4web,evidence_in_ticket,notes):
-        if has_to_be_replaced_before != '':
+        if has_to_be_replaced_before != '' or has_to_be_replaced_before != None:
             has_to_be_replaced_before = has_to_be_replaced_before.split('-')
             has_to_be_replaced_before = datetime.date(int(has_to_be_replaced_before[0]),int(has_to_be_replaced_before[1]),int(has_to_be_replaced_before[2]))
         else:
             has_to_be_replaced_before = None
 
-        if expiration_date != '':
+        if expiration_date != '' or expiration_date != None:
             expiration_date = expiration_date.split('-') 
             expiration_date = datetime.date(int(expiration_date[0]),int(expiration_date[1]),int(expiration_date[2]))
         else:
             expiration_date = None
 
-        if mail_to_co != '':
+        if mail_to_co != '' or mail_to_co != None:
             mail_to_co = mail_to_co.split('-')
             mail_to_co =  datetime.date(int(mail_to_co[0]),int(mail_to_co[1]),int(mail_to_co[2]))
         else:
             mail_to_co = None
             
-        if csr != '':
+        if csr != '' or csr != None:
             csr = csr.split('-')
             csr = datetime.date(int(csr[0]),int(csr[1]),int(csr[2]))
         else:
             csr = None
 
-        if answer_co != '':
+        if answer_co != '' or answer_co != None:
             answer_co = answer_co.split('-')
             answer_co = datetime.date(int(answer_co[0]),int(answer_co[1]),int(answer_co[2]))
         else:
             answer_co = None
 
-        if order_certificate != '':
+        if order_certificate != '' or order_certificate != None:
             order_certificate = order_certificate.split('-')
             order_certificate = datetime.date(int(order_certificate[0]),int(order_certificate[1]),int(order_certificate[2]))
         else:
             order_certificate = None
 
-        if delivery_from_siemens != '':
+        if delivery_from_siemens != '' or delivery_from_siemens != None:
             delivery_from_siemens = delivery_from_siemens.split('-')
             delivery_from_siemens =  datetime.date(int(delivery_from_siemens[0]),int(delivery_from_siemens[1]),int(delivery_from_siemens[2]))
         else:
             delivery_from_siemens = None
 
-        if p12_and_zip != '':
+        if p12_and_zip != '' or p12_and_zip != None:
             p12_and_zip = p12_and_zip.split('-')
             p12_and_zip =  datetime.date(int(p12_and_zip[0]),int(p12_and_zip[1]),int(p12_and_zip[2]))
         else:
             p12_and_zip = None
 
-        if moved_to_server != '':
+        if moved_to_server != '' or moved_to_server != None:
             moved_to_server = moved_to_server.split('-')
             moved_to_server =  datetime.date(int(moved_to_server[0]),int(moved_to_server[1]),int(moved_to_server[2]))
         else:
             moved_to_server = None
 
-        if implemented != '':
+        if implemented != '' or implemented != None:
             implemented = implemented.split('-')
             implemented =  datetime.date(int(implemented[0]),int(implemented[1]),int(implemented[2]))
         else:
             implemented = None
 
-        if deleted_gm4web != '':
+        if deleted_gm4web != '' or deleted_gm4web != None:
             deleted_gm4web = deleted_gm4web.split('-')
             deleted_gm4web =  datetime.date(int(deleted_gm4web[0]),int(deleted_gm4web[1]),int(deleted_gm4web[2]))
         else:
             deleted_gm4web = None
 
-        if evidence_in_ticket != '':
+        if evidence_in_ticket != '' or evidence_in_ticket != None:
             evidence_in_ticket = evidence_in_ticket.split('-')
             evidence_in_ticket =  datetime.date(int(evidence_in_ticket[0]),int(evidence_in_ticket[1]),int(evidence_in_ticket[2]))
         else:
@@ -275,76 +275,105 @@ def insert_db(data):
 
 @app.route('/add/new/certificate/save', methods=['POST'])
 def save_new_certificate():
-    completed = request.form['completed']
-    worker =  request.form['worker']
-    team =  request.form['team']
-    has_to_be_replaced_before = request.form['has_to_be_replaced_before']
-    expiration_date = request.form['expiration_date']
-    ticket_number = request.form['ticket_number']
-    certificate = request.form['cn']
-    server_name = request.form['server_name']
-    web_type = request.form['web_type']
-    type = request.form['type']
-    mail_to_co = request.form['mail_to_co']
-    csr = request.form['csr']
-    answer_co = request.form['answer_co']
-    order_certificate = request.form['order_certificate']
-    delivery_from_siemens = request.form['delivery_from_siemens']
-    p12_and_zip = request.form['p12_and_zip']
-    moved_to_server = request.form['moved_to_server']
-    implemented = request.form['implemented']
-    deleted_gm4web = request.form['deleted_gm4web']
-    evidence_in_ticket = request.form['evidence_in_ticket']
-    notes = request.form['notes']
+    if request.method == 'POST':
+        dict = request.form.to_dict()
+        if dict['completed'] == '':
+            dict['completed'] = None
+        if dict['worker'] == '':
+            dict['worker'] = None
+        if dict['team'] == '':
+            dict['team'] = None
+        if dict['has_to_be_replaced_before'] == '':
+            dict['has_to_be_replaced_before'] = None
+        if dict['expiration_date'] == '':
+            dict['expiration_date'] = None
+        if dict['ticket_number'] == '':
+            dict['ticket_number'] = None
+        if dict['cn'] == '':
+            dict['cn'] = None
+        if dict['server_name'] == '':
+            dict['server_name'] = None
+        if dict['web_type'] == '':
+            dict['web_type'] = None
+        if dict['type'] == '':
+            dict['type'] = None
+        if dict['mail_to_co'] == '':
+            dict['mail_to_co'] = None
+        if dict['csr'] == '':
+            dict['csr'] = None
+        if dict['answer_co'] == '':
+            dict['answer_co'] = None
+        if dict['order_certificate'] == '':
+            dict['order_certificate'] = None
+        if dict['delivery_from_siemens'] == '':
+            dict['delivery_from_siemens'] = None
+        if dict['p12_and_zip'] == '':
+            dict['p12_and_zip'] = None
+        if dict['moved_to_server'] == '':
+            dict['moved_to_server'] = None
+        if dict['implemented'] == '':
+            dict['implemented'] = None
+        if dict['deleted_gm4web'] == '':
+            dict['deleted_gm4web'] = None
+        if dict['evidence_in_ticket'] == '':
+            dict['evidence_in_ticket'] = None
+        if dict['notes'] == '':
+            dict['notes'] = None
 
-    print completed 
-    print worker 
-    print team 
-    print has_to_be_replaced_before 
-    print expiration_date 
-    print ticket_number 
-    print certificate 
-    print server_name 
-    print web_type 
-    print type
-    print mail_to_co 
-    print csr 
-    print answer_co 
-    print order_certificate 
-    print delivery_from_siemens 
-    print p12_and_zip 
-    print moved_to_server 
-    print implemented
-    print deleted_gm4web 
-    print evidence_in_ticket
-    print notes
+        for item in dict:
+            print item
 
-    obj = db.session.query(Certificates).order_by(Certificates.id.desc()).first()
-    id = obj.id+1
-    certificate = Certificates(id,
-        completed=completed,
-        worker=worker,
-        team=team,
-        has_to_be_replaced_before=has_to_be_replaced_before,
-        expiration_date=expiration_date,
-        ticket_number=ticket_number,
-        certificate=certificate,
-        server_name=server_name,
-        web_type=web_type,
-        type=type,
-        mail_to_co=mail_to_co,
-        csr=csr,
-        answer_co=answer_co,
-        order_certificate=order_certificate,
-        delivery_from_siemens=delivery_from_siemens,
-        p12_and_zip=p12_and_zip,
-        moved_to_server=moved_to_server,
-        implemented=implemented,
-        deleted_gm4web=deleted_gm4web,
-        evidence_in_ticket=evidence_in_ticket,
-        notes=notes)
-    db.session.add(certificate)
-    db.session.commit()
+        completed = dict['completed']
+        worker =  dict['worker']
+        team =  dict['team']
+        has_to_be_replaced_before = dict['has_to_be_replaced_before']
+        expiration_date = dict['expiration_date']
+        ticket_number = dict['ticket_number']
+        certificate = dict['cn']
+        server_name = dict['server_name']
+        web_type = dict['web_type']
+        type = dict['type']
+        mail_to_co = dict['mail_to_co']
+        csr = dict['csr']
+        answer_co = dict['answer_co']
+        order_certificate = dict['order_certificate']
+        delivery_from_siemens = dict['delivery_from_siemens']
+        p12_and_zip = dict['p12_and_zip']
+        moved_to_server = dict['moved_to_server']
+        implemented = dict['implemented']
+        deleted_gm4web = dict['deleted_gm4web']
+        evidence_in_ticket = dict['evidence_in_ticket']
+        notes = dict['notes']
+
+        obj = db.session.query(Certificates).order_by(Certificates.id.desc()).first()
+        id = obj.id+1
+        certificate = Certificates(id,
+            completed=completed,
+            worker=worker,
+            team=team,
+            has_to_be_replaced_before=has_to_be_replaced_before,
+            expiration_date=expiration_date,
+            ticket_number=ticket_number,
+            certificate=certificate,
+            server_name=server_name,
+            web_type=web_type,
+            type=type,
+            mail_to_co=mail_to_co,
+            csr=csr,
+            answer_co=answer_co,
+            order_certificate=order_certificate,
+            delivery_from_siemens=delivery_from_siemens,
+            p12_and_zip=p12_and_zip,
+            moved_to_server=moved_to_server,
+            implemented=implemented,
+            deleted_gm4web=deleted_gm4web,
+            evidence_in_ticket=evidence_in_ticket,
+            notes=notes)
+        db.session.add(certificate)
+        db.session.commit()
+        return render_template('save_success.html')
+    else:
+        return render_template('parse.html')
 
 @app.route('/add/new/certificate', methods=['POST'])
 def create_task():
