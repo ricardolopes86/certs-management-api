@@ -1,11 +1,13 @@
 
 import sqlite3
 import json
-from flask import Flask, jsonify, g, request, abort, render_template, redirect, url_for
+from flask import Flask, jsonify, g, request, abort, render_template, redirect, url_for, flash
 from flask_sqlalchemy import Model, SQLAlchemy
 import datetime
 
 app = Flask(__name__)
+
+app.secret_key = 'certificates-management'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///certificates.db'
 #app.config['SQLALCHEMY_ECHO'] = True
@@ -201,81 +203,6 @@ create_table()
 def index():
     return render_template('index.html')
 
-@app.route('/add/new', methods=['GET'])
-def add_new():
-    return render_template('new.html')
-
-@app.route('/add/new/parse', methods=['POST'])
-def parse_new():
-    text = request.form['text_from_mail']
-    if text == '' or text == ' ' or text == None:
-        return render_template('parse.html')
-    else:
-        text =  text.split(' ')
-        if text[0] != 'Our':
-            return render_template('parse.html')
-        else:
-            cert_type = text[9][1:-1]
-            cert_cn = text[12]
-            cert_exp_month = text[16]
-            cert_exp_day = text[17][:-1]
-            cert_exp_year = text[18]
-            exp_date = cert_exp_year+"-"+month_string_to_number(cert_exp_month)+"-"+cert_exp_day
-            data = {}
-            data['cn_type'] = cert_type
-            data['cn'] = cert_cn
-            data['expiration_date'] = exp_date
-            return render_template('parse.html', data=data)
-
-@app.route('/edit/certificate/<int:id>')
-def edit_certificate(id):
-    certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
-    return render_template('edit.html', certficate=certficate)
-
-@app.route('/delete/certificate/<int:id>')
-def delete_certificate(id):
-    certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
-    db.session.remove(certficate)
-    db.session.commit()
-    return redirect('/list/all' + '#myModal')
-
-@app.route('/complete/certificate/<int:id>')
-def complete_certificate(id):
-    certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
-    certficate.completed = 'Yes'
-    db.session.commit()
-    return redirect('/list/all' + '#myModal')
-
-
-@app.route('/search', methods=['GET','POST'])
-def search():
-    if request.method == 'POST':
-        criteria = request.form['criteria']
-        search_text = request.form['search_text']
-        items = {}
-        if criteria == 'worker':
-            items = db.session.query(Certificates).filter(Certificates.worker==search_text).all()
-        if criteria == 'cn':
-            items = db.session.query(Certificates).filter(Certificates.certificate==search_text).all()
-        if criteria == 'completed':
-            items = db.session.query(Certificates).filter(Certificates.completed=='Yes').all()
-        if criteria == 'not_completed':
-            items = db.session.query(Certificates).filter(Certificates.completed=='No').all()
-    else:
-        criteria = request.args['criteria']
-        search_text = request.args['search_text']
-        items = {}
-        if criteria == 'worker':
-            items = db.session.query(Certificates).filter(Certificates.worker==search_text).all()
-        if criteria == 'cn':
-            items = db.session.query(Certificates).filter(Certificates.certificate==search_text).all()
-        if criteria == 'completed':
-            items = db.session.query(Certificates).filter(Certificates.completed=='yes').all()
-        if criteria == 'not_completed':
-            items = db.session.query(Certificates).filter(Certificates.completed=='no').all()
-        
-    print items
-    return render_template('search.html', result=items)
 
 def query_like_db(field, data):
     field = field.lower()
@@ -322,11 +249,89 @@ def insert_db(data):
     db.session.add(certificate)
     db.session.commit()
 
+@app.route('/add/new', methods=['GET'])
+def add_new():
+    return render_template('new.html')
+
+@app.route('/add/new/parse', methods=['POST'])
+def parse_new():
+    text = request.form['text_from_mail']
+    if text == '' or text == ' ' or text == None:
+        return render_template('parse.html')
+    else:
+        text =  text.split(' ')
+        if text[0] != 'Our':
+            return render_template('parse.html')
+        else:
+            cert_type = text[9][1:-1]
+            cert_cn = text[12]
+            cert_exp_month = text[16]
+            cert_exp_day = text[17][:-1]
+            cert_exp_year = text[18]
+            exp_date = cert_exp_year+"-"+month_string_to_number(cert_exp_month)+"-"+cert_exp_day
+            data = {}
+            data['cn_type'] = cert_type
+            data['cn'] = cert_cn
+            data['expiration_date'] = exp_date
+            return render_template('parse.html', data=data)
+
+@app.route('/edit/certificate/<int:id>')
+def edit_certificate(id):
+    certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
+    return render_template('edit.html', certficate=certficate)
+
+@app.route('/delete/certificate/<int:id>')
+def delete_certificate(id):
+    certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
+    db.session.delete(certficate)
+    db.session.commit()
+    flash('Entry deleted successfully.','success')
+    return redirect('/list/all' + '#myModal')
+
+@app.route('/complete/certificate/<int:id>')
+def complete_certificate(id):
+    certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
+    certficate.completed = 'Yes'
+    db.session.commit()
+    flash('Entry marked as Completed successfully.','success')
+    return redirect('/list/all' + '#myModal')
+
+
+@app.route('/search', methods=['GET','POST'])
+def search():
+    if request.method == 'POST':
+        criteria = request.form['criteria']
+        search_text = request.form['search_text']
+        items = {}
+        if criteria == 'worker':
+            items = db.session.query(Certificates).filter(Certificates.worker==search_text).all()
+        if criteria == 'cn':
+            items = db.session.query(Certificates).filter(Certificates.certificate==search_text).all()
+        if criteria == 'completed':
+            items = db.session.query(Certificates).filter(Certificates.completed=='Yes').all()
+        if criteria == 'not_completed':
+            items = db.session.query(Certificates).filter(Certificates.completed=='No').all()
+    else:
+        criteria = request.args['criteria']
+        search_text = request.args['search_text']
+        items = {}
+        if criteria == 'worker':
+            items = db.session.query(Certificates).filter(Certificates.worker==search_text).all()
+        if criteria == 'cn':
+            items = db.session.query(Certificates).filter(Certificates.certificate==search_text).all()
+        if criteria == 'completed':
+            items = db.session.query(Certificates).filter(Certificates.completed=='yes').all()
+        if criteria == 'not_completed':
+            items = db.session.query(Certificates).filter(Certificates.completed=='no').all()
+        
+    print items
+    return render_template('search.html', result=items)
+
 @app.route('/add/new/certificate/save', methods=['POST'])
 def save_new_certificate():
     if request.method == 'POST':
         dict = request.form.to_dict()
-        print dict
+        # print dict
         if dict['completed'] == '':
             dict['completed'] = None
         if dict['worker'] == '':
@@ -370,8 +375,8 @@ def save_new_certificate():
         if dict['notes'] == '':
             dict['notes'] = None
 
-        for item in dict:
-            print item
+        # for item in dict:
+        #     print item
 
         completed = dict['completed']
         worker =  dict['worker']
@@ -396,7 +401,10 @@ def save_new_certificate():
         notes = dict['notes']
 
         obj = db.session.query(Certificates).order_by(Certificates.id.desc()).first()
-        id = obj.id+1
+        if obj is None:
+            id = 1
+        else:
+            id = obj.id+1
         certificate = Certificates(id,
             completed=completed,
             worker=worker,
@@ -421,6 +429,7 @@ def save_new_certificate():
             notes=notes)
         db.session.add(certificate)
         db.session.commit()
+        flash('Item added successfully.','success')
         return render_template('save_success.html')
     else:
         return render_template('parse.html')
