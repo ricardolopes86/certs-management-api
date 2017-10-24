@@ -39,73 +39,73 @@ class Certificates(db.Model):
     notes = db.Column(db.Text)
 
     def __init__(self,id,completed,worker,team,has_to_be_replaced_before,expiration_date,ticket_number,certificate,server_name,web_type,type,mail_to_co,csr,answer_co,order_certificate,delivery_from_siemens,p12_and_zip,moved_to_server,implemented,deleted_gm4web,evidence_in_ticket,notes):
-        if has_to_be_replaced_before != '' or has_to_be_replaced_before != None:
+        if has_to_be_replaced_before != '' and has_to_be_replaced_before is not None:
             has_to_be_replaced_before = has_to_be_replaced_before.split('-')
             has_to_be_replaced_before = datetime.date(int(has_to_be_replaced_before[0]),int(has_to_be_replaced_before[1]),int(has_to_be_replaced_before[2]))
         else:
             has_to_be_replaced_before = None
 
-        if expiration_date != '' or expiration_date != None:
+        if expiration_date != '' and expiration_date is not None:
             expiration_date = expiration_date.split('-') 
             expiration_date = datetime.date(int(expiration_date[0]),int(expiration_date[1]),int(expiration_date[2]))
         else:
             expiration_date = None
 
-        if mail_to_co != '' or mail_to_co != None:
+        if mail_to_co != '' and mail_to_co is not None:
             mail_to_co = mail_to_co.split('-')
             mail_to_co =  datetime.date(int(mail_to_co[0]),int(mail_to_co[1]),int(mail_to_co[2]))
         else:
             mail_to_co = None
             
-        if csr != '' or csr != None:
+        if csr != '' and csr is not None:
             csr = csr.split('-')
             csr = datetime.date(int(csr[0]),int(csr[1]),int(csr[2]))
         else:
             csr = None
 
-        if answer_co != '' or answer_co != None:
+        if answer_co != '' and answer_co is not None:
             answer_co = answer_co.split('-')
             answer_co = datetime.date(int(answer_co[0]),int(answer_co[1]),int(answer_co[2]))
         else:
             answer_co = None
 
-        if order_certificate != '' or order_certificate != None:
+        if order_certificate != '' and order_certificate is not None:
             order_certificate = order_certificate.split('-')
             order_certificate = datetime.date(int(order_certificate[0]),int(order_certificate[1]),int(order_certificate[2]))
         else:
             order_certificate = None
 
-        if delivery_from_siemens != '' or delivery_from_siemens != None:
+        if delivery_from_siemens != '' and delivery_from_siemens is not None:
             delivery_from_siemens = delivery_from_siemens.split('-')
             delivery_from_siemens =  datetime.date(int(delivery_from_siemens[0]),int(delivery_from_siemens[1]),int(delivery_from_siemens[2]))
         else:
             delivery_from_siemens = None
 
-        if p12_and_zip != '' or p12_and_zip != None:
+        if p12_and_zip != '' and p12_and_zip is not None:
             p12_and_zip = p12_and_zip.split('-')
             p12_and_zip =  datetime.date(int(p12_and_zip[0]),int(p12_and_zip[1]),int(p12_and_zip[2]))
         else:
             p12_and_zip = None
 
-        if moved_to_server != '' or moved_to_server != None:
+        if moved_to_server != '' and moved_to_server is not None:
             moved_to_server = moved_to_server.split('-')
             moved_to_server =  datetime.date(int(moved_to_server[0]),int(moved_to_server[1]),int(moved_to_server[2]))
         else:
             moved_to_server = None
 
-        if implemented != '' or implemented != None:
+        if implemented != '' and implemented is not None:
             implemented = implemented.split('-')
             implemented =  datetime.date(int(implemented[0]),int(implemented[1]),int(implemented[2]))
         else:
             implemented = None
 
-        if deleted_gm4web != '' or deleted_gm4web != None:
+        if deleted_gm4web != '' and deleted_gm4web is not None:
             deleted_gm4web = deleted_gm4web.split('-')
             deleted_gm4web =  datetime.date(int(deleted_gm4web[0]),int(deleted_gm4web[1]),int(deleted_gm4web[2]))
         else:
             deleted_gm4web = None
 
-        if evidence_in_ticket != '' or evidence_in_ticket != None:
+        if evidence_in_ticket != '' and evidence_in_ticket is not None:
             evidence_in_ticket = evidence_in_ticket.split('-')
             evidence_in_ticket =  datetime.date(int(evidence_in_ticket[0]),int(evidence_in_ticket[1]),int(evidence_in_ticket[2]))
         else:
@@ -277,6 +277,7 @@ def insert_db(data):
 def save_new_certificate():
     if request.method == 'POST':
         dict = request.form.to_dict()
+        print dict
         if dict['completed'] == '':
             dict['completed'] = None
         if dict['worker'] == '':
