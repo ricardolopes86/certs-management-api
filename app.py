@@ -277,8 +277,8 @@ def parse_new():
 
 @app.route('/edit/certificate/<int:id>')
 def edit_certificate(id):
-    certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
-    return render_template('edit.html', certficate=certficate)
+    certificate = db.session.query(Certificates).filter(Certificates.id==id).first()
+    return render_template('edit.html', certificate=certificate)
 
 @app.route('/delete/certificate/<int:id>')
 def delete_certificate(id):
@@ -296,6 +296,79 @@ def complete_certificate(id):
     flash('Entry marked as Completed successfully.','success')
     return redirect('/list/all' + '#myModal')
 
+@app.route('/edit/certificate/save/<int:id>', methods=['POST'])
+def save_edit_certificate(id):
+    dict = request.form.to_dict()
+    # print dict
+    ''' if dict['completed'] == '' or dict['completed'] == None:
+        dict['completed'] = None
+    if dict['worker'] == '' or dict['worker'] == None:
+        dict['worker'] = None
+    if dict['team'] == '' or dict['team'] == None:
+        dict['team'] = None
+    if dict['has_to_be_replaced_before'] == '' or dict['has_to_be_replaced_before'] == None:
+        dict['has_to_be_replaced_before'] = None
+    if dict['expiration_date'] == '' or dict['expiration_date'] == None:
+        dict['expiration_date'] = None
+    if dict['ticket_number'] == '' or dict['ticket_number'] == None:
+        dict['ticket_number'] = None
+    if dict['cn'] == '' or dict['cn'] == None:
+        dict['cn'] = None
+    if dict['server_name'] == '' or dict['server_name'] == None:
+        dict['server_name'] = None
+    if dict['web_type'] == '' or dict['web_type'] == None:
+        dict['web_type'] = None
+    if dict['type'] == '' or dict['type'] == None:
+        dict['type'] = None
+    if dict['mail_to_co'] == '' or dict['mail_to_co'] == None:
+        dict['mail_to_co'] = None
+    if dict['csr'] == '' or dict['csr'] == None:
+        dict['csr'] = None
+    if dict['answer_co'] == '' or dict['answer_co'] == None:
+        dict['answer_co'] = None
+    if dict['order_certificate'] == '' or dict['order_certificate'] == None:
+        dict['order_certificate'] = None
+    if dict['delivery_from_siemens'] == '' or dict['delivery_from_siemens'] == None:
+        dict['delivery_from_siemens'] = None
+    if dict['p12_and_zip'] == '' or dict['p12_and_zip'] == None:
+        dict['p12_and_zip'] = None
+    if dict['moved_to_server'] == '' or dict['moved_to_server'] == None:
+        dict['moved_to_server'] = None
+    if dict['implemented'] == '' or dict['implemented'] == None:
+        dict['implemented'] = None
+    if dict['deleted_gm4web'] == '' or dict['deleted_gm4web'] == None:
+        dict['deleted_gm4web'] = None
+    if dict['evidence_in_ticket'] == '' or dict['evidence_in_ticket'] == None:
+        dict['evidence_in_ticket'] = None
+    if dict['notes'] == '' or dict['notes'] == None:
+        dict['notes'] = None '''
+        
+    certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
+    certficate.completed = dict['completed']
+    certficate.worker =  dict['worker']
+    certficate.team =  dict['team']
+    certficate.has_to_be_replaced_before = dict['has_to_be_replaced_before']
+    certficate.expiration_date = dict['expiration_date']
+    certficate.ticket_number = dict['ticket_number']
+    certficate.certificate = dict['cn']
+    certficate.server_name = dict['server_name']
+    certficate.web_type = dict['web_type']
+    certficate.type = dict['type']
+    certficate.mail_to_co = dict['mail_to_co']
+    certficate.csr = dict['csr']
+    certficate.answer_co = dict['answer_co']
+    certficate.order_certificate = dict['order_certificate']
+    certficate.delivery_from_siemens = dict['delivery_from_siemens']
+    certficate.p12_and_zip = dict['p12_and_zip']
+    certficate.moved_to_server = dict['moved_to_server']
+    certficate.implemented = dict['implemented']
+    certficate.deleted_gm4web = dict['deleted_gm4web']
+    certficate.evidence_in_ticket = dict['evidence_in_ticket']
+    certficate.notes = dict['notes']
+
+    db.session.commit()
+    flash('Entry saved successfully.','success')
+    return redirect('/list/all' + '#myModal')
 
 @app.route('/search', methods=['GET','POST'])
 def search():

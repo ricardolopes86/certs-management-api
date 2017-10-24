@@ -9,7 +9,7 @@
     <link rel="icon" href="/static/favicon.ico">
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
     <link href="/static/css/jquery-ui.css" rel="stylesheet">
-    <title>Fixed top navbar example for Bootstrap</title>
+    <title>Certificate Management</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
@@ -228,7 +228,7 @@
                     <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
                 </div>
             </div>
-            <input type="submit" value="Save">
+            <input type="submit" class="btn btn-primary btn-lg" value="Save">
         </form>
         {% else %}
         <form action="/add/new/certificate/save" method="post">
@@ -377,7 +377,7 @@
                     <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
                 </div>
             </div>
-            <input type="submit" value="Save">
+            <input type="submit" class="btn btn-primary btn-lg" value="Save">
         </form>
         {% endif %}
     </main>
