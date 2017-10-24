@@ -320,9 +320,9 @@ def search():
         if criteria == 'cn':
             items = db.session.query(Certificates).filter(Certificates.certificate==search_text).all()
         if criteria == 'completed':
-            items = db.session.query(Certificates).filter(Certificates.completed=='yes').all()
+            items = db.session.query(Certificates).filter(Certificates.completed=='Yes').all()
         if criteria == 'not_completed':
-            items = db.session.query(Certificates).filter(Certificates.completed=='no').all()
+            items = db.session.query(Certificates).filter(Certificates.completed=='No').all()
         
     print items
     return render_template('search.html', result=items)

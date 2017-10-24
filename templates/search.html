@@ -130,19 +130,22 @@
                     <td>{{item.evidence_in_ticket}}</td>
                     <td>{{item.notes}}</td>
                 </tr>
-                {% endfor %} {% else %}
-                <div class="jumbotron">
-                    <div class="container">
-                        <h1 class="display-3">Error</h1>
-                        <p class="lead">Nothing found with your search criteria.</p>
-                    </div>
-                </div>
-                {% endif %}
+                {% endfor %}
             </tbody>
         </table>
     </main>
+    {% else %}
+    <main class="container">
+        <div class="jumbotron">
+            <div class="container">
+                <h1 class="display-3">Error</h1>
+                <p class="lead">Nothing found with your search criteria.</p>
+            </div>
+        </div>
+    </main>
+    {% endif %}
     <!-- Small modal -->
-    
+
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
