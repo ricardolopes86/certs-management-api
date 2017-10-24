@@ -1,14 +1,14 @@
 
 import sqlite3
 import json
-from flask import Flask, jsonify, g, request, abort, render_template
+from flask import Flask, jsonify, g, request, abort, render_template, redirect, url_for
 from flask_sqlalchemy import Model, SQLAlchemy
 import datetime
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///certificates.db'
-app.config['SQLALCHEMY_ECHO'] = True
+#app.config['SQLALCHEMY_ECHO'] = True
 
 
 db = SQLAlchemy(app)
@@ -226,7 +226,56 @@ def parse_new():
             data['cn'] = cert_cn
             data['expiration_date'] = exp_date
             return render_template('parse.html', data=data)
+
+@app.route('/edit/certificate/<int:id>')
+def edit_certificate(id):
+    certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
+    return render_template('edit.html', certficate=certficate)
+
+@app.route('/delete/certificate/<int:id>')
+def delete_certificate(id):
+    certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
+    db.session.remove(certficate)
+    db.session.commit()
+    return redirect('/list/all' + '#myModal')
+
+@app.route('/complete/certificate/<int:id>')
+def complete_certificate(id):
+    certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
+    certficate.completed = 'Yes'
+    db.session.commit()
+    return redirect('/list/all' + '#myModal')
+
+
+@app.route('/search', methods=['GET','POST'])
+def search():
+    if request.method == 'POST':
+        criteria = request.form['criteria']
+        search_text = request.form['search_text']
+        items = {}
+        if criteria == 'worker':
+            items = db.session.query(Certificates).filter(Certificates.worker==search_text).all()
+        if criteria == 'cn':
+            items = db.session.query(Certificates).filter(Certificates.certificate==search_text).all()
+        if criteria == 'completed':
+            items = db.session.query(Certificates).filter(Certificates.completed=='Yes').all()
+        if criteria == 'not_completed':
+            items = db.session.query(Certificates).filter(Certificates.completed=='No').all()
+    else:
+        criteria = request.args['criteria']
+        search_text = request.args['search_text']
+        items = {}
+        if criteria == 'worker':
+            items = db.session.query(Certificates).filter(Certificates.worker==search_text).all()
+        if criteria == 'cn':
+            items = db.session.query(Certificates).filter(Certificates.certificate==search_text).all()
+        if criteria == 'completed':
+            items = db.session.query(Certificates).filter(Certificates.completed=='yes').all()
+        if criteria == 'not_completed':
+            items = db.session.query(Certificates).filter(Certificates.completed=='no').all()
         
+    print items
+    return render_template('search.html', result=items)
 
 def query_like_db(field, data):
     field = field.lower()
