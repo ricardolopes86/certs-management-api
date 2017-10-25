@@ -158,3 +158,95 @@ notes
             evidence_in_ticket =  datetime.date(int(evidence_in_ticket[0]),int(evidence_in_ticket[1]),int(evidence_in_ticket[2]))
         else:
             evidence_in_ticket = None  '''
+
+   print (certificate.has_to_be_replaced_before)
+    print (certificate.mail_to_co)
+    print (certificate.completed)
+    print (certificate.worker)
+    print (certificate.team)
+    print (certificate.has_to_be_replaced_before)
+    print (certificate.expiration_date)
+    print (certificate.ticket_number)
+    print (certificate.certificate)
+    print (certificate.server_name)
+    print (certificate.web_type)
+    print (certificate.type)
+    print (certificate.mail_to_co)
+    print (certificate.csr)
+    print (certificate.answer_co)
+    print (certificate.order_certificate)
+    print (certificate.delivery_from_siemens)
+    print (certificate.p12_and_zip) 
+    print (certificate.moved_to_server)
+    print (certificate.implemented)
+    print (certificate.deleted_gm4web)
+    print (certificate.evidence_in_ticket)
+    print (certificate.notes)
+
+@app.route('/api/worker/<string:worker>', methods=['GET'])
+def get_task_by_worker(worker):
+    return jsonify(query_like_db('worker', worker))
+
+@app.route('/api/cert/<int:id>', methods=['GET'])
+def get_task_by_id(id):
+    return jsonify(query_db('id', id))
+
+@app.route('/api/completed/yes', methods=['GET'])
+def all_completed():
+    return jsonify(query_db('completed', 'yes'))
+
+@app.route('/api/completed/no', methods=['GET'])
+def all_not_completed():
+    return jsonify(query_like_db('completed', 'no'))
+
+@app.route('/api/team/<string:team>', methods=['GET'])
+def get_cert_by_team(team):
+    return jsonify(query_like_db('team', team))
+
+@app.route('/api/cn/<string:cn>', methods=['GET'])
+def get_cert_by_cn(cn):
+    return jsonify(query_like_db('certificate', cn))
+
+@app.route('/api/cn/<string:cn>/full', methods=['GET'])
+def get_cert_by_cn_full(cn):
+    return jsonify(query_db('certificate', cn))
+
+def query_like_db(field, data):
+    field = field.lower()
+    if type(data) == str:
+        data = data.lower()
+    con = sqlite3.connect("certificates.db")
+    con.row_factory = sqlite3.Row
+    result = []
+    cur = con.cursor()
+    sql = '''select * from certificates where '''+field+''' like "%{wk}%"'''.format(wk=data)
+    cur.execute(sql)
+    rows = cur.fetchall()
+    for row in rows:
+        result.append([x for x in row])
+    return result
+
+def query_db(field, data):
+    field = field.lower()
+    if type(data) == str:
+        data = data.lower()
+    con = sqlite3.connect("certificates.db")
+    con.row_factory = sqlite3.Row
+    result = []
+    cur = con.cursor()
+    cur.execute('''select * from certificates where '''+str(field)+''' = "{d}"'''.format(d=data))
+    rows = cur.fetchall()
+    for row in rows:
+        result.append([x for x in row])
+    return result
+
+def query_db_all():
+    con = sqlite3.connect("certificates.db")
+    con.row_factory = sqlite3.Row
+    result = []
+    cur = con.cursor()
+    cur.execute('''select * from certificates''')
+    rows = cur.fetchall()
+    for row in rows:
+        result.append([x for x in row])
+    return result

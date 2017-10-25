@@ -24,8 +24,13 @@
     <script type="text/javascript" src="/static/js/bootstrap-datepicker.min.js"></script>
     <link rel="stylesheet" href="/static/css/bootstrap-datepicker.standalone.min.css" />
     <script>
-        $('.datepicker').datepicker({
-            format: 'yyyy-mm-dd'
+        $(document).ready(function () {
+            $('input[type=text]').val(function (i, text_original) {
+                return text_original === 'None' ? '' : text_original;
+            });
+            $('input[type=textarea]').text(function (i, text_original) {
+                return text_original === 'None' ? '' : text_original;
+            });
         });
     </script>
 </head>
@@ -83,11 +88,14 @@
         {% if certificate %}
         <form action="/edit/certificate/save/{{certificate.id}}" method="post">
             <div class="form-group row">
-                <label for="worker" class="col-2 col-form-label">Completed</label>
+                <label for="completed" class="col-2 col-form-label">Completed</label>
                 <div class="col-10">
                     <select class="form-control" id="completed" name="completed">
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
+                        {% for key in completed_states %}
+                        <option value="{{key}}" {% if key == certificate.completed %} selected="selected" {% endif %}>
+                            {{key}}
+                        </option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -95,13 +103,11 @@
                 <label for="worker" class="col-2 col-form-label">Select Workder</label>
                 <div class="col-10">
                     <select class="form-control" id="worker" name="worker">
-                        <option value="None">None</option>
-                        <option value="Adam Karendys">Adam Karendys</option>
-                        <option value="Adam Kordjaczynski">Adam Kordjaczynski</option>
-                        <option value="Krzysztof Barabasz">Krzysztof Barabasz</option>
-                        <option value="Piotr Karys">Piotr Karys</option>
-                        <option value="Raul Balestra">Raul Balestra</option>
-                        <option value="Ricardo Silva">Ricardo Silva</option>
+                        {% for key in workers %}
+                        <option value="{{key}}" {% if key == certificate.worker %} selected="selected" {% endif %}>
+                            {{key}}
+                        </option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -114,8 +120,8 @@
             <div class="form-group row">
                 <label for="has_to_be_replaced_before" class="col-2 col-form-label">Has to be replaced before</label>
                 <div class="col-10">
-                    <input class="form-control" type="text" value="{{certificate.has_to_be_replaced_before}}" id="has_to_be_replaced_before" name="has_to_be_replaced_before" data-provide="datepicker"
-                        data-date-format="yyyy-mm-dd">
+                    <input class="form-control" type="text" value="{{certificate.has_to_be_replaced_before}}" id="has_to_be_replaced_before"
+                        name="has_to_be_replaced_before" data-provide="datepicker" data-date-format="yyyy-mm-dd">
                 </div>
             </div>
             <div class="form-group row">
@@ -133,8 +139,8 @@
             <div class="form-group row">
                 <label for="expiration_date" class="col-2 col-form-label">Expiration Date</label>
                 <div class="col-10">
-                    <input class="form-control" type="text" value="{{certificate.expiration_date}}" id="expiration_date" name="expiration_date" data-provide="datepicker"
-                        data-date-format="yyyy-mm-dd">
+                    <input class="form-control" type="text" value="{{certificate.expiration_date}}" id="expiration_date" name="expiration_date"
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
                 </div>
             </div>
             <div class="form-group row">
@@ -158,68 +164,71 @@
             <div class="form-group row">
                 <label for="mail_to_co" class="col-2 col-form-label">Mail to Content Owner (Content Owner)</label>
                 <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.mail_to_co}}" id="mail_to_co" name="mail_to_co" data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                    <input class="form-control datepicker" type="text" value="{{certificate.mail_to_co}}" id="mail_to_co" name="mail_to_co" data-provide="datepicker"
+                        data-date-format="yyyy-mm-dd">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="csr" class="col-2 col-form-label">CSR Created At</label>
                 <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.csr}}" id="csr" name="csr" data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                    <input class="form-control datepicker" type="text" value="{{certificate.csr}}" id="csr" name="csr" data-provide="datepicker"
+                        data-date-format="yyyy-mm-dd">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="answer_co" class="col-2 col-form-label">Answer From CO</label>
                 <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.answer_co}}" id="answer_co" name="answer_co" data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                    <input class="form-control datepicker" type="text" value="{{certificate.answer_co}}" id="answer_co" name="answer_co" data-provide="datepicker"
+                        data-date-format="yyyy-mm-dd">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="order_certificate" class="col-2 col-form-label">Certificate Ordered</label>
                 <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.order_certificate}}" id="order_certificate" name="order_certificate" data-provide="datepicker"
-                        data-date-format="yyyy-mm-dd">
+                    <input class="form-control datepicker" type="text" value="{{certificate.order_certificate}}" id="order_certificate" name="order_certificate"
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="delivery_from_siemens" class="col-2 col-form-label">Delivered From Siemens</label>
                 <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.delivery_from_siemens}}" id="delivery_from_siemens" name="delivery_from_siemens" data-provide="datepicker"
-                        data-date-format="yyyy-mm-dd">
+                    <input class="form-control datepicker" type="text" value="{{certificate.delivery_from_siemens}}" id="delivery_from_siemens"
+                        name="delivery_from_siemens" data-provide="datepicker" data-date-format="yyyy-mm-dd">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="p12_and_zip" class="col-2 col-form-label">P12 and ZIP Created</label>
                 <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.p12_and_zip}}" id="p12_and_zip" name="p12_and_zip" data-provide="datepicker"
-                        data-date-format="yyyy-mm-dd">
+                    <input class="form-control datepicker" type="text" value="{{certificate.p12_and_zip}}" id="p12_and_zip" name="p12_and_zip"
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="moved_to_server" class="col-2 col-form-label">Moved to Server</label>
                 <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.moved_to_server}}" id="moved_to_server" name="moved_to_server" data-provide="datepicker"
-                        data-date-format="yyyy-mm-dd">
+                    <input class="form-control datepicker" type="text" value="{{certificate.moved_to_server}}" id="moved_to_server" name="moved_to_server"
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="implemented" class="col-2 col-form-label">Implemented</label>
                 <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.implemented}}" id="implemented" name="implemented" data-provide="datepicker"
-                        data-date-format="yyyy-mm-dd">
+                    <input class="form-control datepicker" type="text" value="{{certificate.implemented}}" id="implemented" name="implemented"
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="deleted_gm4web" class="col-2 col-form-label">Deleted From GM4WEB</label>
                 <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.deleted_gm4web}}" id="deleted_gm4web" name="deleted_gm4web" data-provide="datepicker"
-                        data-date-format="yyyy-mm-dd">
+                    <input class="form-control datepicker" type="text" value="{{certificate.deleted_gm4web}}" id="deleted_gm4web" name="deleted_gm4web"
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="evidence_in_ticket" class="col-2 col-form-label">Evidence In Ticket</label>
                 <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.evidence_in_ticket}}" id="evidence_in_ticket" name="evidence_in_ticket" data-provide="datepicker"
-                        data-date-format="yyyy-mm-dd">
+                    <input class="form-control datepicker" type="text" value="{{certificate.evidence_in_ticket}}" id="evidence_in_ticket" name="evidence_in_ticket"
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
                 </div>
             </div>
             <div class="form-group row">

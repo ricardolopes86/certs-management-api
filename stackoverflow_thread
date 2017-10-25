@@ -1,0 +1,452 @@
+I need to know a way to save a true Null to the database by using Flask-SQLAlchemy. Now when I receive a blank field from the form, I try to handle it by settnig it to None. Here you go some code
+
+Here is the code where I create the table in the database:
+
+    import sqlite3
+    import json
+    from flask import Flask, jsonify, g, request, abort, render_template, redirect, url_for, flash
+    from flask_sqlalchemy import Model, SQLAlchemy
+    from sqlalchemy import text
+    import datetime
+
+    app = Flask(__name__)
+
+    app.secret_key = 'certificates-management'
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///certificates.db'
+
+    db = SQLAlchemy(app)
+
+    def create_table():
+    try:
+        with sqlite3.connect('certificates.db') as con:
+            cur = con.cursor()
+            cur.execute('''CREATE TABLE IF NOT EXISTS certificates (
+                            id INTEGER PRIMARY KEY NOT NULL,
+                            completed BOOLEAN,
+                            worker VARCHAR(255) NOT NULL,
+                            team VARCHAR(255),
+                            has_to_be_replaced_before DATE,
+                            expiration_date DATE,
+                            ticket_number VARCHAR(255),
+                            certificate VARCHAR(255),
+                            server_name VARCHAR(255),
+                            web_type VARCHAR(255),
+                            type VARCHAR(255),
+                            mail_to_co DATE,
+                            csr DATE,
+                            answer_co DATE,
+                            order_certificate DATE,
+                            delivery_from_siemens DATE,
+                            p12_and_zip DATE,
+                            moved_to_server DATE,
+                            implemented DATE,
+                            deleted_gm4web DATE,
+                            evidence_in_ticket DATE,
+                            notes TEXT);
+                            ''')
+            con.commit()
+    except sqlite3.OperationalError, msg:
+        print msg
+        con.rollback()
+    finally:
+        con.close()
+
+    create_table()
+
+This is the code in which I save the data from the form to the database. In this code there is the Model definition where in my init funcion, I check if the received data is '', None or 'None' for the fields which are from the Date type, if so, then I set then to None (to avoid SQLAlchemy try to validate and then throw and error):
+
+    class Certificates(db.Model):
+        __tablename__ = 'certificates'
+        id = db.Column(db.Integer, primary_key=True)
+        completed = db.Column(db.String(255), nullable=True)
+        worker = db.Column(db.String(255), nullable=True)
+        team = db.Column(db.String(255), nullable=True)
+        has_to_be_replaced_before = db.Column(db.Date(), nullable=True) 
+        expiration_date = db.Column(db.Date(), nullable=True)
+        ticket_number = db.Column(db.String(255), nullable=True)
+        certificate = db.Column(db.String(255), nullable=True)
+        server_name = db.Column(db.String(255), nullable=True)
+        web_type = db.Column(db.String(255), nullable=True)
+        type = db.Column(db.String(255), nullable=True)
+        mail_to_co = db.Column(db.Date(), nullable=True)
+        csr = db.Column(db.Date(), nullable=True)
+        answer_co = db.Column(db.Date(), nullable=True)
+        order_certificate = db.Column(db.Date(), nullable=True)
+        delivery_from_siemens = db.Column(db.Date(), nullable=True)
+        p12_and_zip = db.Column(db.Date(), nullable=True)
+        moved_to_server = db.Column(db.Date(), nullable=True)
+        implemented = db.Column(db.Date(), nullable=True)
+        deleted_gm4web = db.Column(db.Date(), nullable=True)
+        evidence_in_ticket = db.Column(db.Date(), nullable=True)
+        notes = db.Column(db.Text, nullable=True)
+
+        def __init__(self,id,completed,worker,team,has_to_be_replaced_before,expiration_date,ticket_number,certificate,server_name,web_type,type,mail_to_co,csr,answer_co,order_certificate,delivery_from_siemens,p12_and_zip,moved_to_server,implemented,deleted_gm4web,evidence_in_ticket,notes):
+            if has_to_be_replaced_before != '' and has_to_be_replaced_before != None and has_to_be_replaced_before != 'None':
+                has_to_be_replaced_before = has_to_be_replaced_before.split('-')
+                has_to_be_replaced_before = datetime.date(int(has_to_be_replaced_before[0]),int(has_to_be_replaced_before[1]),int(has_to_be_replaced_before[2]))
+            else:
+                has_to_be_replaced_before = None
+
+            if expiration_date != '' and expiration_date != None and expiration_date != 'None':
+                expiration_date = expiration_date.split('-') 
+                expiration_date = datetime.date(int(expiration_date[0]),int(expiration_date[1]),int(expiration_date[2]))
+            else:
+                expiration_date = None
+
+            if mail_to_co != '' and mail_to_co != None and mail_to_co != 'None':
+                mail_to_co = mail_to_co.split('-')
+                mail_to_co =  datetime.date(int(mail_to_co[0]),int(mail_to_co[1]),int(mail_to_co[2]))
+            else:
+                mail_to_co = None
+                
+            if csr != '' and csr != None and csr != 'None':
+                csr = csr.split('-')
+                csr = datetime.date(int(csr[0]),int(csr[1]),int(csr[2]))
+            else:
+                csr = None
+
+            if answer_co != '' and answer_co != None and answer_co != 'None':
+                answer_co = answer_co.split('-')
+                answer_co = datetime.date(int(answer_co[0]),int(answer_co[1]),int(answer_co[2]))
+            else:
+                answer_co = None
+
+            if order_certificate != '' and order_certificate != None and order_certificate != 'None':
+                order_certificate = order_certificate.split('-')
+                order_certificate = datetime.date(int(order_certificate[0]),int(order_certificate[1]),int(order_certificate[2]))
+            else:
+                order_certificate = None
+
+            if delivery_from_siemens != '' and delivery_from_siemens != None and delivery_from_siemens != 'None':
+                delivery_from_siemens = delivery_from_siemens.split('-')
+                delivery_from_siemens =  datetime.date(int(delivery_from_siemens[0]),int(delivery_from_siemens[1]),int(delivery_from_siemens[2]))
+            else:
+                delivery_from_siemens = None
+
+            if p12_and_zip != '' and p12_and_zip != None and p12_and_zip != 'None':
+                p12_and_zip = p12_and_zip.split('-')
+                p12_and_zip =  datetime.date(int(p12_and_zip[0]),int(p12_and_zip[1]),int(p12_and_zip[2]))
+            else:
+                p12_and_zip = None
+
+            if moved_to_server != '' and moved_to_server != None and moved_to_server != 'None':
+                moved_to_server = moved_to_server.split('-')
+                moved_to_server =  datetime.date(int(moved_to_server[0]),int(moved_to_server[1]),int(moved_to_server[2]))
+            else:
+                moved_to_server = None
+
+            if implemented != '' and implemented != None and implemented != 'None':
+                implemented = implemented.split('-')
+                implemented =  datetime.date(int(implemented[0]),int(implemented[1]),int(implemented[2]))
+            else:
+                implemented = None
+
+            if deleted_gm4web != '' and deleted_gm4web != None and deleted_gm4web != 'None':
+                deleted_gm4web = deleted_gm4web.split('-')
+                deleted_gm4web =  datetime.date(int(deleted_gm4web[0]),int(deleted_gm4web[1]),int(deleted_gm4web[2]))
+            else:
+                deleted_gm4web = None
+
+            if evidence_in_ticket != '' and evidence_in_ticket != None and evidence_in_ticket != 'None':
+                evidence_in_ticket = evidence_in_ticket.split('-')
+                evidence_in_ticket =  datetime.date(int(evidence_in_ticket[0]),int(evidence_in_ticket[1]),int(evidence_in_ticket[2]))
+            else:
+                evidence_in_ticket = None
+            self.id = id
+            self.completed = completed
+            self.worker = worker
+            self.team = team
+            self.has_to_be_replaced_before = has_to_be_replaced_before
+            self.expiration_date = expiration_date
+            self.ticket_number = ticket_number
+            self.certificate = certificate
+            self.server_name = server_name
+            self.web_type = web_type
+            self.type = type
+            self.mail_to_co = mail_to_co
+            self.csr = csr
+            self.answer_co = answer_co
+            self.order_certificate = order_certificate
+            self.delivery_from_siemens = delivery_from_siemens
+            self.p12_and_zip = p12_and_zip
+            self.moved_to_server = moved_to_server
+            self.implemented = implemented
+            self.deleted_gm4web = deleted_gm4web
+            self.evidence_in_ticket = evidence_in_ticket
+            self.notes = notes
+
+    def insert_db(data):
+        certificate = Certificates(data['id'],data['completed'],data['worker'],data['team'],data['has_to_be_replaced_before'],data['expiration_date'],data['ticket_number'],data['certificate'],data['server_name'],data['web_type'],data['type'],data['mail_to_co'],data['csr'],data['answer_co'],data['order_certificate'],data['delivery_from_siemens'],data['p12_and_zip'],data['moved_to_server'],data['implemented'],data['deleted_gm4web'],data['evidence_in_ticket'],data['notes'])
+        db.session.add(certificate)
+        db.session.commit()
+
+For the purpose of saving the data, I can save, but when I load it from database, I see the following data on it:
+
+
+I want to avoid this lot of None in my view by just inserting blank instead of None.
+The problem becomes worse when I try to edit an existing row. I load data from database successfully and then pass the data to the view. In the view I have a save button to update the fields I've changed.
+Here is the code in where I load the data from database, based on the URL data and send this data to the edit form:
+    @app.route('/edit/certificate/<int:id>')
+    def edit_certificate(id):
+        certificate = db.session.query(Certificates).filter(Certificates.id==id).first()
+        return render_template('edit.html', certificate=certificate)
+
+Here is the code of the view:
+    <!doctype html>
+    <html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="icon" href="/static/favicon.ico">
+        <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+        <link href="/static/css/jquery-ui.css" rel="stylesheet">
+        <title>Certificate Management</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+
+
+        <!-- Custom styles for this template -->
+        <link href="/static/css/navbar-top-fixed.css" rel="stylesheet">
+        <script src="/static/js/jquery-3.2.1.min.js"></script>
+        <script src="/static/js/popper.min.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+        <!-- Bootstrap Date-Picker Plugin -->
+        <script type="text/javascript" src="/static/js/bootstrap-datepicker.min.js"></script>
+        <link rel="stylesheet" href="/static/css/bootstrap-datepicker.standalone.min.css" />
+        <script>
+            $('.datepicker').datepicker({
+                format: 'yyyy-mm-dd'
+            });
+        </script>
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+            <a class="navbar-brand" href="/">Certificates Management</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse"
+                aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">Home
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/add/new">Add New Certificate</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/list/all">Show All Certificates</a>
+                    </li>
+                </ul>
+                <form class="form-inline mt-2 mt-md-0" action="/search">
+                    <input class="form-control mr-sm-2" type="text" name="search_text" placeholder="Search" aria-label="Search">
+                    <label class="custom-control custom-radio">
+                        <input id="radio1" name="criteria" type="radio" class="custom-control-input" value="worker">
+                        <span class="custom-control-indicator"></span>
+                        <span class="custom-control-description text-white">Worker</span>
+                    </label>
+                    <label class="custom-control custom-radio">
+                        <input id="radio2" name="criteria" type="radio" class="custom-control-input" value="cn" checked>
+                        <span class="custom-control-indicator"></span>
+                        <span class="custom-control-description text-white">CN</span>
+                    </label>
+                    <label class="custom-control custom-radio">
+                        <input id="radio3" name="criteria" type="radio" class="custom-control-input" value="not_completed">
+                        <span class="custom-control-indicator"></span>
+                        <span class="custom-control-description text-white">Not Completed</span>
+                    </label>
+                    <label class="custom-control custom-radio">
+                        <input id="radio4" name="criteria" type="radio" class="custom-control-input" value="completed">
+                        <span class="custom-control-indicator"></span>
+                        <span class="custom-control-description text-white">Completed</span>
+                    </label>
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </div>
+        </nav>
+
+        <main role="main" class="container">
+            {% if certificate %}
+            <form action="/edit/certificate/save/{{certificate.id}}" method="post">
+                <div class="form-group row">
+                    <label for="worker" class="col-2 col-form-label">Completed</label>
+                    <div class="col-10">
+                        <select class="form-control" id="completed" name="completed">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="worker" class="col-2 col-form-label">Select Workder</label>
+                    <div class="col-10">
+                        <select class="form-control" id="worker" name="worker">
+                            <option value="None">None</option>
+                            <option value="Adam Karendys">Adam Karendys</option>
+                            <option value="Adam Kordjaczynski">Adam Kordjaczynski</option>
+                            <option value="Krzysztof Barabasz">Krzysztof Barabasz</option>
+                            <option value="Piotr Karys">Piotr Karys</option>
+                            <option value="Raul Balestra">Raul Balestra</option>
+                            <option value="Ricardo Silva">Ricardo Silva</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="cn" class="col-2 col-form-label">Team</label>
+                    <div class="col-10">
+                        <input class="form-control" type="text" value="{{certificate.team}}" id="team" name="team">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="has_to_be_replaced_before" class="col-2 col-form-label">Has to be replaced before</label>
+                    <div class="col-10">
+                        <input class="form-control" type="text" value="{{certificate.has_to_be_replaced_before}}" id="has_to_be_replaced_before" name="has_to_be_replaced_before" data-provide="datepicker"
+                            data-date-format="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="cn" class="col-2 col-form-label">CN</label>
+                    <div class="col-10">
+                        <input class="form-control" type="text" value="{{certificate.certificate}}" id="cn" name="cn">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="type" class="col-2 col-form-label">Certificate Type</label>
+                    <div class="col-10">
+                        <input class="form-control" type="text" value="{{certificate.type}}" id="type" name="type">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="expiration_date" class="col-2 col-form-label">Expiration Date</label>
+                    <div class="col-10">
+                        <input class="form-control" type="text" value="{{certificate.expiration_date}}" id="expiration_date" name="expiration_date" data-provide="datepicker"
+                            data-date-format="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="ticket_number" class="col-2 col-form-label">Ticket Number</label>
+                    <div class="col-10">
+                        <input class="form-control" type="text" value="{{certificate.ticket_number}}" id="ticket_number" name="ticket_number">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="server_name" class="col-2 col-form-label">Server Name</label>
+                    <div class="col-10">
+                        <input class="form-control" type="text" value="{{certificate.server_name}}" id="server_name" name="server_name">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="web_type" class="col-2 col-form-label">Web Type</label>
+                    <div class="col-10">
+                        <input class="form-control" type="text" value="{{certificate.web_type}}" id="web_type" name="web_type">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="mail_to_co" class="col-2 col-form-label">Mail to Content Owner (Content Owner)</label>
+                    <div class="col-10">
+                        <input class="form-control datepicker" type="text" value="{{certificate.mail_to_co}}" id="mail_to_co" name="mail_to_co" data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="csr" class="col-2 col-form-label">CSR Created At</label>
+                    <div class="col-10">
+                        <input class="form-control datepicker" type="text" value="{{certificate.csr}}" id="csr" name="csr" data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="answer_co" class="col-2 col-form-label">Answer From CO</label>
+                    <div class="col-10">
+                        <input class="form-control datepicker" type="text" value="{{certificate.answer_co}}" id="answer_co" name="answer_co" data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="order_certificate" class="col-2 col-form-label">Certificate Ordered</label>
+                    <div class="col-10">
+                        <input class="form-control datepicker" type="text" value="{{certificate.order_certificate}}" id="order_certificate" name="order_certificate" data-provide="datepicker"
+                            data-date-format="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="delivery_from_siemens" class="col-2 col-form-label">Delivered From Siemens</label>
+                    <div class="col-10">
+                        <input class="form-control datepicker" type="text" value="{{certificate.delivery_from_siemens}}" id="delivery_from_siemens" name="delivery_from_siemens" data-provide="datepicker"
+                            data-date-format="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="p12_and_zip" class="col-2 col-form-label">P12 and ZIP Created</label>
+                    <div class="col-10">
+                        <input class="form-control datepicker" type="text" value="{{certificate.p12_and_zip}}" id="p12_and_zip" name="p12_and_zip" data-provide="datepicker"
+                            data-date-format="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="moved_to_server" class="col-2 col-form-label">Moved to Server</label>
+                    <div class="col-10">
+                        <input class="form-control datepicker" type="text" value="{{certificate.moved_to_server}}" id="moved_to_server" name="moved_to_server" data-provide="datepicker"
+                            data-date-format="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="implemented" class="col-2 col-form-label">Implemented</label>
+                    <div class="col-10">
+                        <input class="form-control datepicker" type="text" value="{{certificate.implemented}}" id="implemented" name="implemented" data-provide="datepicker"
+                            data-date-format="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="deleted_gm4web" class="col-2 col-form-label">Deleted From GM4WEB</label>
+                    <div class="col-10">
+                        <input class="form-control datepicker" type="text" value="{{certificate.deleted_gm4web}}" id="deleted_gm4web" name="deleted_gm4web" data-provide="datepicker"
+                            data-date-format="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="evidence_in_ticket" class="col-2 col-form-label">Evidence In Ticket</label>
+                    <div class="col-10">
+                        <input class="form-control datepicker" type="text" value="{{certificate.evidence_in_ticket}}" id="evidence_in_ticket" name="evidence_in_ticket" data-provide="datepicker"
+                            data-date-format="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="notes" class="col-2 col-form-label">Notes</label>
+                    <div class="col-10">
+                        <textarea class="form-control" id="notes" name="notes" rows="3">{{certificate.notes}}</textarea>
+                    </div>
+                </div>
+                <input type="submit" class="btn btn-primary btn-lg" value="Save">
+            </form>
+        </main>
+        {% else %}
+        <main class="container">
+            <div class="jumbotron">
+                <h1 class="display-3">Error!</h1>
+                <p class="lead">No records found for this ID.</p>
+                <hr class="my-4">
+                <p>Go Back to the full list.</p>
+                <p class="lead">
+                    <a class="btn btn-primary btn-lg" href="/list/all" role="button">View All</a>
+                </p>
+            </div>
+        </main>
+        {% endif %}
+    </body>
+
+    </html> 
+
+When I click save, I get the following error:
+    raise TypeError("SQLite Date type only accepts Python "
+    StatementError: (exceptions.TypeError) SQLite Date type only accepts Python date objects as input. [SQL: u'UPDATE certificates SET worker=?, has_to_be_replaced_before=?, expiration_date=?, ticket_number=?, certificate=?, server_name=?, web_type=?, type=?, mail_to_co=?, csr=?, answer_co=?, order_certificate=?, delivery_from_siemens=?, p12_and_zip=?, moved_to_server=?, implemented=?, deleted_gm4web=?, evidence_in_ticket=?, notes=? WHERE certificates.id = ?'] [parameters: [{'order_certificate': u'None', 'answer_co': u'None', 'server_name': u'None', 'certificate': u'None', 'evidence_in_ticket': u'None', 'expiration_date': u'None', 'notes': u'None', 'certificates_id': 5, 'moved_to_server': u'None', 'has_to_be_replaced_before': u'2017-10-27', 'p12_and_zip': u'None', 'delivery_from_siemens': u'None', 'mail_to_co': u'2017-10-25', 'web_type': u'None', 'worker': u'None', 'ticket_number': u'None', 'deleted_gm4web': u'None', 'implemented': u'None', 'type': u'None', 'csr': u'None'}]]
+
+My best guess is that because of the None information stored in the databse, it's confusing Flask when it comes to save the actual form.
+
+Thank you in advance.

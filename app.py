@@ -4,7 +4,7 @@ import json
 from flask import Flask, jsonify, g, request, abort, render_template, redirect, url_for, flash
 from flask_sqlalchemy import Model, SQLAlchemy
 from sqlalchemy import text
-import datetime
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -237,7 +237,32 @@ def parse_new():
 @app.route('/edit/certificate/<int:id>')
 def edit_certificate(id):
     certificate = db.session.query(Certificates).filter(Certificates.id==id).first()
-    return render_template('edit.html', certificate=certificate)
+
+    certificate.completed = '' if certificate.completed == 'None' else certificate.completed
+    certificate.worker =  '' if certificate.worker == 'None' else certificate.worker
+    certificate.team =  '' if certificate.team == 'None' else certificate.team
+    certificate.has_to_be_replaced_before = '' if certificate.has_to_be_replaced_before == 'None' else certificate.has_to_be_replaced_before
+    certificate.expiration_date = '' if certificate.expiration_date == 'None' else certificate.expiration_date
+    certificate.ticket_number = '' if certificate.ticket_number == 'None' else certificate.ticket_number
+    certificate.certificate = '' if certificate.certificate == 'None' else certificate.certificate
+    certificate.server_name = '' if certificate.server_name == 'None' else certificate.server_name
+    certificate.web_type = '' if certificate.web_type == 'None' else certificate.web_type
+    certificate.type = '' if certificate.type == 'None' else certificate.type
+    certificate.mail_to_co = '' if certificate.mail_to_co == 'None' else certificate.mail_to_co
+    certificate.csr = '' if certificate.csr == 'None' else certificate.csr
+    certificate.answer_co = '' if certificate.answer_co == 'None' else certificate.answer_co
+    certificate.order_certificate = '' if certificate.order_certificate == 'None' else certificate.order_certificate
+    certificate.delivery_from_siemens = '' if certificate.delivery_from_siemens == 'None' else certificate.delivery_from_siemens
+    certificate.p12_and_zip = '' if certificate.p12_and_zip == 'None' else certificate.p12_and_zip
+    certificate.moved_to_server = '' if certificate.moved_to_server == 'None' else certificate.moved_to_server
+    certificate.implemented = '' if certificate.implemented == 'None' else certificate.implemented
+    certificate.deleted_gm4web = '' if certificate.deleted_gm4web == 'None' else certificate.deleted_gm4web
+    certificate.evidence_in_ticket = '' if certificate.evidence_in_ticket == 'None' else certificate.evidence_in_ticket
+    certificate.notes = '' if certificate.notes == 'None' else certificate.notes
+
+    workers = {'None','Adam Karendys', 'Adam Kordjaczynski', 'Krzysztof Barabasz','Piotr Karys','Raul Balestra','Ricardo Silva'}
+    completed_states = {'No', 'Yes'}
+    return render_template('edit.html', certificate=certificate, workers=workers, completed_states=completed_states)
 
 @app.route('/delete/certificate/<int:id>')
 def delete_certificate(id):
@@ -258,32 +283,57 @@ def complete_certificate(id):
 @app.route('/edit/certificate/save/<int:id>', methods=['POST'])
 def save_edit_certificate(id):
     dict = request.form.to_dict()
+
+    certificate = db.session.query(Certificates).filter(Certificates.id==id).first()
+
+    if certificate.has_to_be_replaced_before != dict['has_to_be_replaced_before'] and dict['has_to_be_replaced_before'] != ''  and  datetime.strptime(dict['has_to_be_replaced_before'], '%Y-%m-%d'):
+        certificate.has_to_be_replaced_before = datetime.strptime(dict['has_to_be_replaced_before'], '%Y-%m-%d').date() 
+
+    if certificate.expiration_date != dict['expiration_date'] and dict['expiration_date'] != ''  and  datetime.strptime(dict['expiration_date'], '%Y-%m-%d'):
+        certificate.expiration_date = datetime.strptime(dict['expiration_date'], '%Y-%m-%d').date() 
+
+    if certificate.mail_to_co != dict['mail_to_co'] and dict['mail_to_co'] != ''  and  datetime.strptime(dict['mail_to_co'], '%Y-%m-%d'):
+        certificate.mail_to_co = datetime.strptime(dict['mail_to_co'], '%Y-%m-%d').date()
     
-    certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
-    certficate.completed = dict['completed']
-    certficate.worker =  dict['worker']
-    certficate.team =  dict['team']
-    certficate.has_to_be_replaced_before = dict['has_to_be_replaced_before']
-    certficate.expiration_date = dict['expiration_date']
-    certficate.ticket_number = dict['ticket_number']
-    certficate.certificate = dict['cn']
-    certficate.server_name = dict['server_name']
-    certficate.web_type = dict['web_type']
-    certficate.type = dict['type']
-    certficate.mail_to_co = dict['mail_to_co']
-    certficate.csr = dict['csr']
-    certficate.answer_co = dict['answer_co']
-    certficate.order_certificate = dict['order_certificate']
-    certficate.delivery_from_siemens = dict['delivery_from_siemens']
-    certficate.p12_and_zip = dict['p12_and_zip']
-    certficate.moved_to_server = dict['moved_to_server']
-    certficate.implemented = dict['implemented']
-    certficate.deleted_gm4web = dict['deleted_gm4web']
-    certficate.evidence_in_ticket = dict['evidence_in_ticket']
-    certficate.notes = dict['notes']
+    if certificate.csr != dict['csr'] and dict['csr'] != '' and datetime.strptime(dict['csr'], '%Y-%m-%d'):
+        certificate.csr = datetime.strptime(dict['csr'], '%Y-%m-%d').date() 
+    
+    if certificate.answer_co != dict['answer_co'] and dict['answer_co'] != ''  and  datetime.strptime(dict['answer_co'], '%Y-%m-%d'):
+        certificate.answer_co = datetime.strptime(dict['answer_co'], '%Y-%m-%d').date() 
+    
+    if certificate.order_certificate != dict['order_certificate'] and dict['order_certificate'] != ''  and  datetime.strptime(dict['order_certificate'], '%Y-%m-%d'):
+        certificate.order_certificate = datetime.strptime(dict['order_certificate'], '%Y-%m-%d').date() 
+    
+    if certificate.delivery_from_siemens != dict['delivery_from_siemens'] and dict['delivery_from_siemens'] != ''  and  datetime.strptime(dict['delivery_from_siemens'], '%Y-%m-%d'):
+        certificate.delivery_from_siemens = datetime.strptime(dict['delivery_from_siemens'], '%Y-%m-%d').date() 
+    
+    if certificate.p12_and_zip != dict['p12_and_zip'] and dict['p12_and_zip'] != ''  and  datetime.strptime(dict['p12_and_zip'], '%Y-%m-%d'):
+        certificate.p12_and_zip = datetime.strptime(dict['p12_and_zip'], '%Y-%m-%d').date() 
+    
+    if certificate.moved_to_server != dict['moved_to_server'] and dict['moved_to_server'] != ''  and  datetime.strptime(dict['moved_to_server'], '%Y-%m-%d'):
+        certificate.moved_to_server = datetime.strptime(dict['moved_to_server'], '%Y-%m-%d').date() 
+    
+    if certificate.implemented != dict['implemented'] and dict['implemented'] != ''  and  datetime.strptime(dict['implemented'], '%Y-%m-%d'):
+        certificate.implemented = datetime.strptime(dict['implemented'], '%Y-%m-%d').date() 
+    
+    if certificate.deleted_gm4web != dict['deleted_gm4web'] and dict['deleted_gm4web'] != ''  and  datetime.strptime(dict['deleted_gm4web'], '%Y-%m-%d'):
+        certificate.deleted_gm4web = datetime.strptime(dict['deleted_gm4web'], '%Y-%m-%d').date() 
+    
+    if certificate.evidence_in_ticket != dict['evidence_in_ticket'] and dict['evidence_in_ticket'] != ''  and  datetime.strptime(dict['evidence_in_ticket'], '%Y-%m-%d'):
+        certificate.evidence_in_ticket = datetime.strptime(dict['evidence_in_ticket'], '%Y-%m-%d').date() 
+        
+    certificate.notes =  dict['notes']
+    certificate.completed =  dict['completed']
+    certificate.worker =  dict['worker']
+    certificate.team =   dict['team']
+    certificate.ticket_number =  dict['ticket_number']
+    certificate.certificate = dict['cn']
+    certificate.server_name = dict['server_name']
+    certificate.web_type = dict['web_type']
+    certificate.type = dict['type']
 
     db.session.commit()
-    flash('Entry saved successfully.','success')
+    flash('Entry updated successfully.','success')
     return redirect('/list/all' + '#myModal')
 
 @app.route('/search', methods=['GET','POST'])
@@ -433,7 +483,32 @@ def create_task():
 
 @app.route('/list/all', methods=['GET'])
 def list_all_certs():
-    return render_template('list_all.html',result=db.session.query(Certificates).all())
+
+    certificate = db.session.query(Certificates).all()
+    for item in certificate:
+        item.completed = '' if item.completed == None else item.completed
+        item.worker =  '' if item.worker == None else item.worker
+        item.team =  '' if item.team == None else item.team
+        item.has_to_be_replaced_before = '' if item.has_to_be_replaced_before == None else item.has_to_be_replaced_before
+        item.expiration_date = '' if item.expiration_date == None else item.expiration_date
+        item.ticket_number = '' if item.ticket_number == None else item.ticket_number
+        item.certificate = '' if item.certificate == None else item.certificate
+        item.server_name = '' if item.server_name == None else item.server_name
+        item.web_type = '' if item.web_type == None else item.web_type
+        item.type = '' if item.type == None else item.type
+        item.mail_to_co = '' if item.mail_to_co == None else item.mail_to_co
+        item.csr = '' if item.csr == None else item.csr
+        item.answer_co = '' if item.answer_co == None else item.answer_co
+        item.order_certificate = '' if item.order_certificate == None else item.order_certificate
+        item.delivery_from_siemens = '' if item.delivery_from_siemens == None else item.delivery_from_siemens
+        item.p12_and_zip = '' if item.p12_and_zip == None else item.p12_and_zip
+        item.moved_to_server = '' if item.moved_to_server == None else item.moved_to_server
+        item.implemented = '' if item.implemented == None else item.implemented
+        item.deleted_gm4web = '' if item.deleted_gm4web == None else item.deleted_gm4web
+        item.evidence_in_ticket = '' if item.evidence_in_ticket == None else item.evidence_in_ticket
+        item.notes = '' if item.notes == None else item.notes
+
+    return render_template('list_all.html',result=certificate)
 
 
 if __name__ == '__main__':
