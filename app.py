@@ -42,7 +42,77 @@ class Certificates(db.Model):
     notes = db.Column(db.Text, nullable=True)
 
     def __init__(self,id,completed,worker,team,has_to_be_replaced_before,expiration_date,ticket_number,certificate,server_name,web_type,type,mail_to_co,csr,answer_co,order_certificate,delivery_from_siemens,p12_and_zip,moved_to_server,implemented,deleted_gm4web,evidence_in_ticket,notes):
+        if has_to_be_replaced_before != '' and has_to_be_replaced_before != None and has_to_be_replaced_before != 'None':
+            has_to_be_replaced_before = has_to_be_replaced_before.split('-')
+            has_to_be_replaced_before = datetime.date(int(has_to_be_replaced_before[0]),int(has_to_be_replaced_before[1]),int(has_to_be_replaced_before[2]))
+        else:
+            has_to_be_replaced_before = None
 
+        if expiration_date != '' and expiration_date != None and expiration_date != 'None':
+            expiration_date = expiration_date.split('-') 
+            expiration_date = datetime.date(int(expiration_date[0]),int(expiration_date[1]),int(expiration_date[2]))
+        else:
+            expiration_date = None
+
+        if mail_to_co != '' and mail_to_co != None and mail_to_co != 'None':
+            mail_to_co = mail_to_co.split('-')
+            mail_to_co =  datetime.date(int(mail_to_co[0]),int(mail_to_co[1]),int(mail_to_co[2]))
+        else:
+            mail_to_co = None
+            
+        if csr != '' and csr != None and csr != 'None':
+            csr = csr.split('-')
+            csr = datetime.date(int(csr[0]),int(csr[1]),int(csr[2]))
+        else:
+            csr = None
+
+        if answer_co != '' and answer_co != None and answer_co != 'None':
+            answer_co = answer_co.split('-')
+            answer_co = datetime.date(int(answer_co[0]),int(answer_co[1]),int(answer_co[2]))
+        else:
+            answer_co = None
+
+        if order_certificate != '' and order_certificate != None and order_certificate != 'None':
+            order_certificate = order_certificate.split('-')
+            order_certificate = datetime.date(int(order_certificate[0]),int(order_certificate[1]),int(order_certificate[2]))
+        else:
+            order_certificate = None
+
+        if delivery_from_siemens != '' and delivery_from_siemens != None and delivery_from_siemens != 'None':
+            delivery_from_siemens = delivery_from_siemens.split('-')
+            delivery_from_siemens =  datetime.date(int(delivery_from_siemens[0]),int(delivery_from_siemens[1]),int(delivery_from_siemens[2]))
+        else:
+            delivery_from_siemens = None
+
+        if p12_and_zip != '' and p12_and_zip != None and p12_and_zip != 'None':
+            p12_and_zip = p12_and_zip.split('-')
+            p12_and_zip =  datetime.date(int(p12_and_zip[0]),int(p12_and_zip[1]),int(p12_and_zip[2]))
+        else:
+            p12_and_zip = None
+
+        if moved_to_server != '' and moved_to_server != None and moved_to_server != 'None':
+            moved_to_server = moved_to_server.split('-')
+            moved_to_server =  datetime.date(int(moved_to_server[0]),int(moved_to_server[1]),int(moved_to_server[2]))
+        else:
+            moved_to_server = None
+
+        if implemented != '' and implemented != None and implemented != 'None':
+            implemented = implemented.split('-')
+            implemented =  datetime.date(int(implemented[0]),int(implemented[1]),int(implemented[2]))
+        else:
+            implemented = None
+
+        if deleted_gm4web != '' and deleted_gm4web != None and deleted_gm4web != 'None':
+            deleted_gm4web = deleted_gm4web.split('-')
+            deleted_gm4web =  datetime.date(int(deleted_gm4web[0]),int(deleted_gm4web[1]),int(deleted_gm4web[2]))
+        else:
+            deleted_gm4web = None
+
+        if evidence_in_ticket != '' and evidence_in_ticket != None and evidence_in_ticket != 'None':
+            evidence_in_ticket = evidence_in_ticket.split('-')
+            evidence_in_ticket =  datetime.date(int(evidence_in_ticket[0]),int(evidence_in_ticket[1]),int(evidence_in_ticket[2]))
+        else:
+            evidence_in_ticket = None
         self.id = id
         self.completed = completed
         self.worker = worker
@@ -132,47 +202,6 @@ create_table()
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
-
-
-def query_like_db(field, data):
-    field = field.lower()
-    if type(data) == str:
-        data = data.lower()
-    con = sqlite3.connect("certificates.db")
-    con.row_factory = sqlite3.Row
-    result = []
-    cur = con.cursor()
-    sql = '''select * from certificates where '''+field+''' like "%{wk}%"'''.format(wk=data)
-    cur.execute(sql)
-    rows = cur.fetchall()
-    for row in rows:
-        result.append([x for x in row])
-    return result
-
-def query_db(field, data):
-    field = field.lower()
-    if type(data) == str:
-        data = data.lower()
-    con = sqlite3.connect("certificates.db")
-    con.row_factory = sqlite3.Row
-    result = []
-    cur = con.cursor()
-    cur.execute('''select * from certificates where '''+str(field)+''' = "{d}"'''.format(d=data))
-    rows = cur.fetchall()
-    for row in rows:
-        result.append([x for x in row])
-    return result
-
-def query_db_all():
-    con = sqlite3.connect("certificates.db")
-    con.row_factory = sqlite3.Row
-    result = []
-    cur = con.cursor()
-    cur.execute('''select * from certificates''')
-    rows = cur.fetchall()
-    for row in rows:
-        result.append([x for x in row])
-    return result
 
 def insert_db(data):
     certificate = Certificates(data['id'],data['completed'],data['worker'],data['team'],data['has_to_be_replaced_before'],data['expiration_date'],data['ticket_number'],data['certificate'],data['server_name'],data['web_type'],data['type'],data['mail_to_co'],data['csr'],data['answer_co'],data['order_certificate'],data['delivery_from_siemens'],data['p12_and_zip'],data['moved_to_server'],data['implemented'],data['deleted_gm4web'],data['evidence_in_ticket'],data['notes'])
@@ -264,25 +293,25 @@ def search():
         search_text = request.form['search_text']
         items = {}
         if criteria == 'worker':
-            items = db.session.query(Certificates).filter(Certificates.worker==search_text).all()
+            items = db.session.query(Certificates).filter(Certificates.worker.like('''%'''+search_text+'''%''')).all()
         if criteria == 'cn':
-            items = db.session.query(Certificates).filter(Certificates.certificate==search_text).all()
+            items = db.session.query(Certificates).filter(Certificates.certificate.like('''%'''+search_text+'''%''')).all()
         if criteria == 'completed':
-            items = db.session.query(Certificates).filter(Certificates.completed=='Yes').all()
+            items = db.session.query(Certificates).filter(Certificates.completed.like('Yes')).all()
         if criteria == 'not_completed':
-            items = db.session.query(Certificates).filter(Certificates.completed=='No').all()
+            items = db.session.query(Certificates).filter(Certificates.completed.like('No')).all()
     else:
         criteria = request.args['criteria']
         search_text = request.args['search_text']
         items = {}
         if criteria == 'worker':
-            items = db.session.query(Certificates).filter(Certificates.worker==search_text).all()
+            items = db.session.query(Certificates).filter(Certificates.worker.like('''%'''+search_text+'''%''')).all()
         if criteria == 'cn':
-            items = db.session.query(Certificates).filter(Certificates.certificate==search_text).all()
+            items = db.session.query(Certificates).filter(Certificates.certificate.like('''%'''+search_text+'''%''')).all()
         if criteria == 'completed':
-            items = db.session.query(Certificates).filter(Certificates.completed=='Yes').all()
+            items = db.session.query(Certificates).filter(Certificates.completed.like('Yes')).all()
         if criteria == 'not_completed':
-            items = db.session.query(Certificates).filter(Certificates.completed=='No').all()
+            items = db.session.query(Certificates).filter(Certificates.completed.like('No')).all()
         
     print items
     return render_template('search.html', result=items)
@@ -404,36 +433,7 @@ def create_task():
 
 @app.route('/list/all', methods=['GET'])
 def list_all_certs():
-    result = query_db_all()
     return render_template('list_all.html',result=db.session.query(Certificates).all())
-
-@app.route('/api/worker/<string:worker>', methods=['GET'])
-def get_task_by_worker(worker):
-    return jsonify(query_like_db('worker', worker))
-
-@app.route('/api/cert/<int:id>', methods=['GET'])
-def get_task_by_id(id):
-    return jsonify(query_db('id', id))
-
-@app.route('/api/completed/yes', methods=['GET'])
-def all_completed():
-    return jsonify(query_db('completed', 'yes'))
-
-@app.route('/api/completed/no', methods=['GET'])
-def all_not_completed():
-    return jsonify(query_like_db('completed', 'no'))
-
-@app.route('/api/team/<string:team>', methods=['GET'])
-def get_cert_by_team(team):
-    return jsonify(query_like_db('team', team))
-
-@app.route('/api/cn/<string:cn>', methods=['GET'])
-def get_cert_by_cn(cn):
-    return jsonify(query_like_db('certificate', cn))
-
-@app.route('/api/cn/<string:cn>/full', methods=['GET'])
-def get_cert_by_cn_full(cn):
-    return jsonify(query_db('certificate', cn))
 
 
 if __name__ == '__main__':
