@@ -18,100 +18,100 @@ db = SQLAlchemy(app)
 class Certificates(db.Model):
     __tablename__ = 'certificates'
     id = db.Column(db.Integer, primary_key=True)
-    completed = db.Column(db.String(255))
-    worker = db.Column(db.String(255))
-    team = db.Column(db.String(255))
-    has_to_be_replaced_before = db.Column(db.Date()) 
-    expiration_date = db.Column(db.Date())
-    ticket_number = db.Column(db.String(255))
-    certificate = db.Column(db.String(255))
-    server_name = db.Column(db.String(255))
-    web_type = db.Column(db.String(255))
-    type = db.Column(db.String(255))
-    mail_to_co = db.Column(db.Date())
-    csr = db.Column(db.Date())
-    answer_co = db.Column(db.Date())
-    order_certificate = db.Column(db.Date())
-    delivery_from_siemens = db.Column(db.Date())
-    p12_and_zip = db.Column(db.Date())
-    moved_to_server = db.Column(db.Date())
-    implemented = db.Column(db.Date())
-    deleted_gm4web = db.Column(db.Date())
-    evidence_in_ticket = db.Column(db.Date())
-    notes = db.Column(db.Text)
+    completed = db.Column(db.String(255), nullable=True)
+    worker = db.Column(db.String(255), nullable=True)
+    team = db.Column(db.String(255), nullable=True)
+    has_to_be_replaced_before = db.Column(db.Date(), nullable=True) 
+    expiration_date = db.Column(db.Date(), nullable=True)
+    ticket_number = db.Column(db.String(255), nullable=True)
+    certificate = db.Column(db.String(255), nullable=True)
+    server_name = db.Column(db.String(255), nullable=True)
+    web_type = db.Column(db.String(255), nullable=True)
+    type = db.Column(db.String(255), nullable=True)
+    mail_to_co = db.Column(db.Date(), nullable=True)
+    csr = db.Column(db.Date(), nullable=True)
+    answer_co = db.Column(db.Date(), nullable=True)
+    order_certificate = db.Column(db.Date(), nullable=True)
+    delivery_from_siemens = db.Column(db.Date(), nullable=True)
+    p12_and_zip = db.Column(db.Date(), nullable=True)
+    moved_to_server = db.Column(db.Date(), nullable=True)
+    implemented = db.Column(db.Date(), nullable=True)
+    deleted_gm4web = db.Column(db.Date(), nullable=True)
+    evidence_in_ticket = db.Column(db.Date(), nullable=True)
+    notes = db.Column(db.Text, nullable=True)
 
     def __init__(self,id,completed,worker,team,has_to_be_replaced_before,expiration_date,ticket_number,certificate,server_name,web_type,type,mail_to_co,csr,answer_co,order_certificate,delivery_from_siemens,p12_and_zip,moved_to_server,implemented,deleted_gm4web,evidence_in_ticket,notes):
-        if has_to_be_replaced_before != '' and has_to_be_replaced_before is not None:
+        if has_to_be_replaced_before != '' and has_to_be_replaced_before != None and has_to_be_replaced_before != 'None':
             has_to_be_replaced_before = has_to_be_replaced_before.split('-')
             has_to_be_replaced_before = datetime.date(int(has_to_be_replaced_before[0]),int(has_to_be_replaced_before[1]),int(has_to_be_replaced_before[2]))
         else:
             has_to_be_replaced_before = None
 
-        if expiration_date != '' and expiration_date is not None:
+        if expiration_date != '' and expiration_date != None and expiration_date != 'None':
             expiration_date = expiration_date.split('-') 
             expiration_date = datetime.date(int(expiration_date[0]),int(expiration_date[1]),int(expiration_date[2]))
         else:
             expiration_date = None
 
-        if mail_to_co != '' and mail_to_co is not None:
+        if mail_to_co != '' and mail_to_co != None and mail_to_co != 'None':
             mail_to_co = mail_to_co.split('-')
             mail_to_co =  datetime.date(int(mail_to_co[0]),int(mail_to_co[1]),int(mail_to_co[2]))
         else:
             mail_to_co = None
             
-        if csr != '' and csr is not None:
+        if csr != '' and csr != None and csr != 'None':
             csr = csr.split('-')
             csr = datetime.date(int(csr[0]),int(csr[1]),int(csr[2]))
         else:
             csr = None
 
-        if answer_co != '' and answer_co is not None:
+        if answer_co != '' and answer_co != None and answer_co != 'None':
             answer_co = answer_co.split('-')
             answer_co = datetime.date(int(answer_co[0]),int(answer_co[1]),int(answer_co[2]))
         else:
             answer_co = None
 
-        if order_certificate != '' and order_certificate is not None:
+        if order_certificate != '' and order_certificate != None and order_certificate != 'None':
             order_certificate = order_certificate.split('-')
             order_certificate = datetime.date(int(order_certificate[0]),int(order_certificate[1]),int(order_certificate[2]))
         else:
             order_certificate = None
 
-        if delivery_from_siemens != '' and delivery_from_siemens is not None:
+        if delivery_from_siemens != '' and delivery_from_siemens != None and delivery_from_siemens != 'None':
             delivery_from_siemens = delivery_from_siemens.split('-')
             delivery_from_siemens =  datetime.date(int(delivery_from_siemens[0]),int(delivery_from_siemens[1]),int(delivery_from_siemens[2]))
         else:
             delivery_from_siemens = None
 
-        if p12_and_zip != '' and p12_and_zip is not None:
+        if p12_and_zip != '' and p12_and_zip != None and p12_and_zip != 'None':
             p12_and_zip = p12_and_zip.split('-')
             p12_and_zip =  datetime.date(int(p12_and_zip[0]),int(p12_and_zip[1]),int(p12_and_zip[2]))
         else:
             p12_and_zip = None
 
-        if moved_to_server != '' and moved_to_server is not None:
+        if moved_to_server != '' and moved_to_server != None and moved_to_server != 'None':
             moved_to_server = moved_to_server.split('-')
             moved_to_server =  datetime.date(int(moved_to_server[0]),int(moved_to_server[1]),int(moved_to_server[2]))
         else:
             moved_to_server = None
 
-        if implemented != '' and implemented is not None:
+        if implemented != '' and implemented != None and implemented != 'None':
             implemented = implemented.split('-')
             implemented =  datetime.date(int(implemented[0]),int(implemented[1]),int(implemented[2]))
         else:
             implemented = None
 
-        if deleted_gm4web != '' and deleted_gm4web is not None:
+        if deleted_gm4web != '' and deleted_gm4web != None and deleted_gm4web != 'None':
             deleted_gm4web = deleted_gm4web.split('-')
             deleted_gm4web =  datetime.date(int(deleted_gm4web[0]),int(deleted_gm4web[1]),int(deleted_gm4web[2]))
         else:
             deleted_gm4web = None
 
-        if evidence_in_ticket != '' and evidence_in_ticket is not None:
+        if evidence_in_ticket != '' and evidence_in_ticket != None and evidence_in_ticket != 'None':
             evidence_in_ticket = evidence_in_ticket.split('-')
             evidence_in_ticket =  datetime.date(int(evidence_in_ticket[0]),int(evidence_in_ticket[1]),int(evidence_in_ticket[2]))
         else:
-            evidence_in_ticket = None
+            evidence_in_ticket = None 
 
         self.id = id
         self.completed = completed
@@ -300,49 +300,49 @@ def complete_certificate(id):
 def save_edit_certificate(id):
     dict = request.form.to_dict()
     # print dict
-    ''' if dict['completed'] == '' or dict['completed'] == None:
+    if dict['completed'] == '' or dict['completed'] == 'None':
         dict['completed'] = None
-    if dict['worker'] == '' or dict['worker'] == None:
+    if dict['worker'] == '' or dict['worker'] == 'None':
         dict['worker'] = None
-    if dict['team'] == '' or dict['team'] == None:
+    if dict['team'] == '' or dict['team'] == 'None':
         dict['team'] = None
-    if dict['has_to_be_replaced_before'] == '' or dict['has_to_be_replaced_before'] == None:
+    if dict['has_to_be_replaced_before'] == '' or dict['has_to_be_replaced_before'] == 'None':
         dict['has_to_be_replaced_before'] = None
-    if dict['expiration_date'] == '' or dict['expiration_date'] == None:
+    if dict['expiration_date'] == '' or dict['expiration_date'] == 'None':
         dict['expiration_date'] = None
-    if dict['ticket_number'] == '' or dict['ticket_number'] == None:
+    if dict['ticket_number'] == '' or dict['ticket_number'] == 'None':
         dict['ticket_number'] = None
-    if dict['cn'] == '' or dict['cn'] == None:
+    if dict['cn'] == '' or dict['cn'] == 'None':
         dict['cn'] = None
-    if dict['server_name'] == '' or dict['server_name'] == None:
+    if dict['server_name'] == '' or dict['server_name'] == 'None':
         dict['server_name'] = None
-    if dict['web_type'] == '' or dict['web_type'] == None:
+    if dict['web_type'] == '' or dict['web_type'] == 'None':
         dict['web_type'] = None
-    if dict['type'] == '' or dict['type'] == None:
+    if dict['type'] == '' or dict['type'] == 'None':
         dict['type'] = None
-    if dict['mail_to_co'] == '' or dict['mail_to_co'] == None:
+    if dict['mail_to_co'] == '' or dict['mail_to_co'] == 'None':
         dict['mail_to_co'] = None
-    if dict['csr'] == '' or dict['csr'] == None:
+    if dict['csr'] == '' or dict['csr'] == 'None':
         dict['csr'] = None
-    if dict['answer_co'] == '' or dict['answer_co'] == None:
+    if dict['answer_co'] == '' or dict['answer_co'] == 'None':
         dict['answer_co'] = None
-    if dict['order_certificate'] == '' or dict['order_certificate'] == None:
+    if dict['order_certificate'] == '' or dict['order_certificate'] == 'None':
         dict['order_certificate'] = None
-    if dict['delivery_from_siemens'] == '' or dict['delivery_from_siemens'] == None:
+    if dict['delivery_from_siemens'] == '' or dict['delivery_from_siemens'] == 'None':
         dict['delivery_from_siemens'] = None
-    if dict['p12_and_zip'] == '' or dict['p12_and_zip'] == None:
+    if dict['p12_and_zip'] == '' or dict['p12_and_zip'] == 'None':
         dict['p12_and_zip'] = None
-    if dict['moved_to_server'] == '' or dict['moved_to_server'] == None:
+    if dict['moved_to_server'] == '' or dict['moved_to_server'] == 'None':
         dict['moved_to_server'] = None
-    if dict['implemented'] == '' or dict['implemented'] == None:
+    if dict['implemented'] == '' or dict['implemented'] == 'None':
         dict['implemented'] = None
-    if dict['deleted_gm4web'] == '' or dict['deleted_gm4web'] == None:
+    if dict['deleted_gm4web'] == '' or dict['deleted_gm4web'] == 'None':
         dict['deleted_gm4web'] = None
-    if dict['evidence_in_ticket'] == '' or dict['evidence_in_ticket'] == None:
+    if dict['evidence_in_ticket'] == '' or dict['evidence_in_ticket'] == 'None':
         dict['evidence_in_ticket'] = None
-    if dict['notes'] == '' or dict['notes'] == None:
-        dict['notes'] = None '''
-        
+    if dict['notes'] == '' or dict['notes'] == 'None':
+        dict['notes'] = None
+    
     certficate = db.session.query(Certificates).filter(Certificates.id==id).first()
     certficate.completed = dict['completed']
     certficate.worker =  dict['worker']
@@ -365,7 +365,8 @@ def save_edit_certificate(id):
     certficate.deleted_gm4web = dict['deleted_gm4web']
     certficate.evidence_in_ticket = dict['evidence_in_ticket']
     certficate.notes = dict['notes']
-
+    # print dict
+    # print certficate
     db.session.commit()
     flash('Entry saved successfully.','success')
     return redirect('/list/all' + '#myModal')
