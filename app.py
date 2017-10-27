@@ -3,8 +3,8 @@ import sqlite3
 import json
 from flask import Flask, jsonify, g, request, abort, render_template, redirect, url_for, flash
 from flask_sqlalchemy import Model, SQLAlchemy
-from sqlalchemy import text
-from datetime import datetime
+from sqlalchemy import text, and_
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -201,7 +201,16 @@ def create_table():
 create_table()
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    today = datetime.now()
+    in_a_week = today + timedelta(days=7)
+    certificates = db.session.query(Certificates.id,
+                                    Certificates.expiration_date,
+                                    Certificates.worker,
+                                    Certificates.certificate,
+                                    Certificates.completed,
+                                    Certificates.type).filter(Certificates.expiration_date.between(today.date(), in_a_week.date())).filter(Certificates.completed=='No').all()
+    
+    return render_template('index.html', result=certificates)
 
 def insert_db(data):
     certificate = Certificates(data['id'],data['completed'],data['worker'],data['team'],data['has_to_be_replaced_before'],data['expiration_date'],data['ticket_number'],data['certificate'],data['server_name'],data['web_type'],data['type'],data['mail_to_co'],data['csr'],data['answer_co'],data['order_certificate'],data['delivery_from_siemens'],data['p12_and_zip'],data['moved_to_server'],data['implemented'],data['deleted_gm4web'],data['evidence_in_ticket'],data['notes'])
@@ -270,7 +279,7 @@ def delete_certificate(id):
     db.session.delete(certficate)
     db.session.commit()
     flash('Entry deleted successfully.','success')
-    return redirect('/list/all' + '#myModal')
+    return redirect('/list/all')
 
 @app.route('/complete/certificate/<int:id>')
 def complete_certificate(id):
@@ -278,7 +287,7 @@ def complete_certificate(id):
     certficate.completed = 'Yes'
     db.session.commit()
     flash('Entry marked as Completed successfully.','success')
-    return redirect('/list/all' + '#myModal')
+    return redirect('/list/all')
 
 @app.route('/edit/certificate/save/<int:id>', methods=['POST'])
 def save_edit_certificate(id):
@@ -334,7 +343,7 @@ def save_edit_certificate(id):
 
     db.session.commit()
     flash('Entry updated successfully.','success')
-    return redirect('/list/all' + '#myModal')
+    return redirect('/list/all')
 
 @app.route('/search', methods=['GET','POST'])
 def search():
