@@ -31,25 +31,30 @@
 <body>
 
     <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-        <a class="navbar-brand" href="/"><img src="/static/img/image.png" alt="Certificate Management" height="32px"/></a>
+        <a class="navbar-brand" href="/">
+            <img src="/static/img/image.png" alt="Certificate Management" height="32px" />
+        </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse"
             aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav mr-auto">
-                        <li class="nav-item active">
-                          <a class="nav-link" href="/"> <i class="fa fa-map-marker" aria-hidden="true"></i> Home
-                            <span class="sr-only">(current)</span>
-                          </a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="/add/new"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Add New Certificate</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="/list/all"><i class="fa fa-list-alt" aria-hidden="true"></i> Show All Certificates</a>
-                        </li>
-                      </ul>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">
+                        <i class="fa fa-map-marker" aria-hidden="true"></i> Home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/add/new">
+                        <i class="fa fa-plus-square-o" aria-hidden="true"></i> Add New Certificate</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/list/all">
+                        <i class="fa fa-list-alt" aria-hidden="true"></i> Show All Certificates</a>
+                </li>
+            </ul>
             <form class="form-inline mt-2 mt-md-0" action="/search">
                 <input class="form-control mr-sm-2" type="text" name="search_text" placeholder="Search" aria-label="Search">
                 <label class="custom-control custom-radio">
@@ -79,159 +84,131 @@
 
     <main role="main" class="container">
         {% if certificate %}
-        <form action="/edit/certificate/save/{{certificate.id}}" method="post">
-            <div class="form-group row">
-                <label for="completed" class="col-2 col-form-label">Completed</label>
-                <div class="col-10">
-                    <select class="form-control" id="completed" name="completed">
-                        {% for key in completed_states %}
-                        <option value="{{key}}" {% if key == certificate.completed %} selected="selected" {% endif %}>
-                            {{key}}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
+        <div class="card">
+            <div class="card-body">
+                <form action="/edit/certificate/save/{{certificate.id}}" method="post">
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="completed" class="col-form-label">Completed</label>
+                            <select class="form-control" id="completed" name="completed">
+                                {% for key in completed_states %}
+                                <option value="{{key}}" {% if key == certificate.completed %} selected="selected" {% endif %}>
+                                    {{key}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="worker" class="col-form-label">Select Workder</label>
+                            <select class="form-control" id="worker" name="worker">
+                                {% for key in workers %}
+                                <option value="{{key}}" {% if key== certificate.worker %} selected="selected" {% endif %}>
+                                    {{key}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="cn" class="col-form-label">Team</label>
+                            <input class="form-control" type="text" value="{{certificate.team}}" id="team" name="team">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="has_to_be_replaced_before" class="col-form-label">Has to be replaced before</label>
+                            <input class="form-control" type="text" value="{{certificate.has_to_be_replaced_before}}" id="has_to_be_replaced_before"
+                                name="has_to_be_replaced_before" data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="cn" class="col-form-label">CN</label>
+                            <input class="form-control" type="text" value="{{certificate.certificate}}" id="cn" name="cn">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="type" class="col-form-label">Certificate Type</label>
+                            <input class="form-control" type="text" value="{{certificate.type}}" id="type" name="type">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="expiration_date" class="col-form-label">Expiration Date</label>
+                            <input class="form-control" type="text" value="{{certificate.expiration_date}}" id="expiration_date" name="expiration_date"
+                                data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="ticket_number" class="col-form-label">Ticket Number</label>
+                            <input class="form-control" type="text" value="{{certificate.ticket_number}}" id="ticket_number" name="ticket_number">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="server_name" class="col-form-label">Server Name</label>
+                            <input class="form-control" type="text" value="{{certificate.server_name}}" id="server_name" name="server_name">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="web_type" class="col-form-label">Web Type</label>
+                            <input class="form-control" type="text" value="{{certificate.web_type}}" id="web_type" name="web_type">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="mail_to_co" class="col-form-label">Mail to Content Owner</label>
+                            <input class="form-control" type="text" value="{{certificate.mail_to_co}}" id="mail_to_co" name="mail_to_co" data-provide="datepicker"
+                                data-date-format="yyyy-mm-dd">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="csr" class="col-form-label">CSR Created At</label>
+                            <input class="form-control" type="text" value="{{certificate.csr}}" id="csr" name="csr" data-provide="datepicker"
+                                data-date-format="yyyy-mm-dd">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="answer_co" class="col-form-label">Answer From CO</label>
+                            <input class="form-control" type="text" value="{{certificate.answer_co}}" id="answer_co" name="answer_co" data-provide="datepicker"
+                                data-date-format="yyyy-mm-dd">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="order_certificate" class="col-form-label">Certificate Ordered</label>
+                            <input class="form-control" type="text" value="{{certificate.order_certificate}}" id="order_certificate" name="order_certificate"
+                                data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="delivery_from_siemens" class="col-form-label">Delivered Date</label>
+                            <input class="form-control" type="text" value="{{certificate.delivery_from_siemens}}" id="delivery_from_siemens"
+                                name="delivery_from_siemens" data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="p12_and_zip" class="col-form-label">P12 and ZIP Created</label>
+                            <input class="form-control" type="text" value="{{certificate.p12_and_zip}}" id="p12_and_zip" name="p12_and_zip"
+                                data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="moved_to_server" class="col-form-label">Moved to Server</label>
+                            <input class="form-control" type="text" value="{{certificate.moved_to_server}}" id="moved_to_server" name="moved_to_server"
+                                data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="implemented" class="col-form-label">Implemented</label>
+                            <input class="form-control" type="text" value="{{certificate.implemented}}" id="implemented" name="implemented"
+                                data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="deleted_gm4web" class="col-form-label">Deleted in GM4WEB</label>
+                            <input class="form-control " type="text" value="{{certificate.deleted_gm4web}}" id="deleted_gm4web" name="deleted_gm4web"
+                                data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="form-group col-md-2">
+                            <label for="evidence_in_ticket" class="col-form-label">Evidence In Ticket</label>
+                            <input class="form-control " type="text" value="{{certificate.evidence_in_ticket}}" id="evidence_in_ticket" name="evidence_in_ticket"
+                                data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="notes" class="col-form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3">{{certificate.notes}}</textarea>
+                        </div>
+                    </div>
+                    <input type="submit" class="btn btn-primary btn-lg" value="Save">
+                </form>
             </div>
-            <div class="form-group row">
-                <label for="worker" class="col-2 col-form-label">Select Workder</label>
-                <div class="col-10">
-                    <select class="form-control" id="worker" name="worker">
-                        {% for key in workers %}
-                        <option value="{{key}}" {% if key == certificate.worker %} selected="selected" {% endif %}>
-                            {{key}}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="cn" class="col-2 col-form-label">Team</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" value="{{certificate.team}}" id="team" name="team">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="has_to_be_replaced_before" class="col-2 col-form-label">Has to be replaced before</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" value="{{certificate.has_to_be_replaced_before}}" id="has_to_be_replaced_before"
-                        name="has_to_be_replaced_before" data-provide="datepicker" data-date-format="yyyy-mm-dd">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="cn" class="col-2 col-form-label">CN</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" value="{{certificate.certificate}}" id="cn" name="cn">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="type" class="col-2 col-form-label">Certificate Type</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" value="{{certificate.type}}" id="type" name="type">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="expiration_date" class="col-2 col-form-label">Expiration Date</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" value="{{certificate.expiration_date}}" id="expiration_date" name="expiration_date"
-                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="ticket_number" class="col-2 col-form-label">Ticket Number</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" value="{{certificate.ticket_number}}" id="ticket_number" name="ticket_number">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="server_name" class="col-2 col-form-label">Server Name</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" value="{{certificate.server_name}}" id="server_name" name="server_name">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="web_type" class="col-2 col-form-label">Web Type</label>
-                <div class="col-10">
-                    <input class="form-control" type="text" value="{{certificate.web_type}}" id="web_type" name="web_type">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="mail_to_co" class="col-2 col-form-label">Mail to Content Owner (Content Owner)</label>
-                <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.mail_to_co}}" id="mail_to_co" name="mail_to_co" data-provide="datepicker"
-                        data-date-format="yyyy-mm-dd">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="csr" class="col-2 col-form-label">CSR Created At</label>
-                <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.csr}}" id="csr" name="csr" data-provide="datepicker"
-                        data-date-format="yyyy-mm-dd">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="answer_co" class="col-2 col-form-label">Answer From CO</label>
-                <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.answer_co}}" id="answer_co" name="answer_co" data-provide="datepicker"
-                        data-date-format="yyyy-mm-dd">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="order_certificate" class="col-2 col-form-label">Certificate Ordered</label>
-                <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.order_certificate}}" id="order_certificate" name="order_certificate"
-                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="delivery_from_siemens" class="col-2 col-form-label">Delivered From Siemens</label>
-                <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.delivery_from_siemens}}" id="delivery_from_siemens"
-                        name="delivery_from_siemens" data-provide="datepicker" data-date-format="yyyy-mm-dd">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="p12_and_zip" class="col-2 col-form-label">P12 and ZIP Created</label>
-                <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.p12_and_zip}}" id="p12_and_zip" name="p12_and_zip"
-                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="moved_to_server" class="col-2 col-form-label">Moved to Server</label>
-                <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.moved_to_server}}" id="moved_to_server" name="moved_to_server"
-                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="implemented" class="col-2 col-form-label">Implemented</label>
-                <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.implemented}}" id="implemented" name="implemented"
-                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="deleted_gm4web" class="col-2 col-form-label">Deleted From GM4WEB</label>
-                <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.deleted_gm4web}}" id="deleted_gm4web" name="deleted_gm4web"
-                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="evidence_in_ticket" class="col-2 col-form-label">Evidence In Ticket</label>
-                <div class="col-10">
-                    <input class="form-control datepicker" type="text" value="{{certificate.evidence_in_ticket}}" id="evidence_in_ticket" name="evidence_in_ticket"
-                        data-provide="datepicker" data-date-format="yyyy-mm-dd">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="notes" class="col-2 col-form-label">Notes</label>
-                <div class="col-10">
-                    <textarea class="form-control" id="notes" name="notes" rows="3">{{certificate.notes}}</textarea>
-                </div>
-            </div>
-            <input type="submit" class="btn btn-primary btn-lg" value="Save">
-        </form>
+        </div>
     </main>
     {% else %}
     <main class="container">
