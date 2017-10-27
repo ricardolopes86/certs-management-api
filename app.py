@@ -42,77 +42,6 @@ class Certificates(db.Model):
     notes = db.Column(db.Text, nullable=True)
 
     def __init__(self,id,completed,worker,team,has_to_be_replaced_before,expiration_date,ticket_number,certificate,server_name,web_type,type,mail_to_co,csr,answer_co,order_certificate,delivery_from_siemens,p12_and_zip,moved_to_server,implemented,deleted_gm4web,evidence_in_ticket,notes):
-        if has_to_be_replaced_before != '' and has_to_be_replaced_before != None and has_to_be_replaced_before != 'None':
-            has_to_be_replaced_before = has_to_be_replaced_before.split('-')
-            has_to_be_replaced_before = datetime.date(int(has_to_be_replaced_before[0]),int(has_to_be_replaced_before[1]),int(has_to_be_replaced_before[2]))
-        else:
-            has_to_be_replaced_before = None
-
-        if expiration_date != '' and expiration_date != None and expiration_date != 'None':
-            expiration_date = expiration_date.split('-') 
-            expiration_date = datetime.date(int(expiration_date[0]),int(expiration_date[1]),int(expiration_date[2]))
-        else:
-            expiration_date = None
-
-        if mail_to_co != '' and mail_to_co != None and mail_to_co != 'None':
-            mail_to_co = mail_to_co.split('-')
-            mail_to_co =  datetime.date(int(mail_to_co[0]),int(mail_to_co[1]),int(mail_to_co[2]))
-        else:
-            mail_to_co = None
-            
-        if csr != '' and csr != None and csr != 'None':
-            csr = csr.split('-')
-            csr = datetime.date(int(csr[0]),int(csr[1]),int(csr[2]))
-        else:
-            csr = None
-
-        if answer_co != '' and answer_co != None and answer_co != 'None':
-            answer_co = answer_co.split('-')
-            answer_co = datetime.date(int(answer_co[0]),int(answer_co[1]),int(answer_co[2]))
-        else:
-            answer_co = None
-
-        if order_certificate != '' and order_certificate != None and order_certificate != 'None':
-            order_certificate = order_certificate.split('-')
-            order_certificate = datetime.date(int(order_certificate[0]),int(order_certificate[1]),int(order_certificate[2]))
-        else:
-            order_certificate = None
-
-        if delivery_from_siemens != '' and delivery_from_siemens != None and delivery_from_siemens != 'None':
-            delivery_from_siemens = delivery_from_siemens.split('-')
-            delivery_from_siemens =  datetime.date(int(delivery_from_siemens[0]),int(delivery_from_siemens[1]),int(delivery_from_siemens[2]))
-        else:
-            delivery_from_siemens = None
-
-        if p12_and_zip != '' and p12_and_zip != None and p12_and_zip != 'None':
-            p12_and_zip = p12_and_zip.split('-')
-            p12_and_zip =  datetime.date(int(p12_and_zip[0]),int(p12_and_zip[1]),int(p12_and_zip[2]))
-        else:
-            p12_and_zip = None
-
-        if moved_to_server != '' and moved_to_server != None and moved_to_server != 'None':
-            moved_to_server = moved_to_server.split('-')
-            moved_to_server =  datetime.date(int(moved_to_server[0]),int(moved_to_server[1]),int(moved_to_server[2]))
-        else:
-            moved_to_server = None
-
-        if implemented != '' and implemented != None and implemented != 'None':
-            implemented = implemented.split('-')
-            implemented =  datetime.date(int(implemented[0]),int(implemented[1]),int(implemented[2]))
-        else:
-            implemented = None
-
-        if deleted_gm4web != '' and deleted_gm4web != None and deleted_gm4web != 'None':
-            deleted_gm4web = deleted_gm4web.split('-')
-            deleted_gm4web =  datetime.date(int(deleted_gm4web[0]),int(deleted_gm4web[1]),int(deleted_gm4web[2]))
-        else:
-            deleted_gm4web = None
-
-        if evidence_in_ticket != '' and evidence_in_ticket != None and evidence_in_ticket != 'None':
-            evidence_in_ticket = evidence_in_ticket.split('-')
-            evidence_in_ticket =  datetime.date(int(evidence_in_ticket[0]),int(evidence_in_ticket[1]),int(evidence_in_ticket[2]))
-        else:
-            evidence_in_ticket = None
         self.id = id
         self.completed = completed
         self.worker = worker
@@ -379,7 +308,67 @@ def search():
 def save_new_certificate():
     if request.method == 'POST':
         dict = request.form.to_dict()
-        # print dict
+
+        if dict['has_to_be_replaced_before'] != ''  and  datetime.strptime(dict['has_to_be_replaced_before'], '%Y-%m-%d'):
+            has_to_be_replaced_before = datetime.strptime(dict['has_to_be_replaced_before'], '%Y-%m-%d').date() 
+        else:
+            has_to_be_replaced_before = None
+
+        if dict['expiration_date'] != ''  and  datetime.strptime(dict['expiration_date'], '%Y-%m-%d'):
+            expiration_date = datetime.strptime(dict['expiration_date'], '%Y-%m-%d').date() 
+        else:
+            expiration_date = None
+
+        if dict['mail_to_co'] != ''  and  datetime.strptime(dict['mail_to_co'], '%Y-%m-%d'):
+            mail_to_co = datetime.strptime(dict['mail_to_co'], '%Y-%m-%d').date()
+        else:
+            mail_to_co = None
+        
+        if dict['csr'] != '' and datetime.strptime(dict['csr'], '%Y-%m-%d'):
+            csr = datetime.strptime(dict['csr'], '%Y-%m-%d').date() 
+        else:
+            csr = None
+
+        if dict['answer_co'] != ''  and  datetime.strptime(dict['answer_co'], '%Y-%m-%d'):
+            answer_co = datetime.strptime(dict['answer_co'], '%Y-%m-%d').date() 
+        else:
+            answer_co = None
+
+        if dict['order_certificate'] != ''  and  datetime.strptime(dict['order_certificate'], '%Y-%m-%d'):
+            order_certificate = datetime.strptime(dict['order_certificate'], '%Y-%m-%d').date() 
+        else:
+            order_certificate = None
+
+        if dict['delivery_from_siemens'] != ''  and  datetime.strptime(dict['delivery_from_siemens'], '%Y-%m-%d'):
+            delivery_from_siemens = datetime.strptime(dict['delivery_from_siemens'], '%Y-%m-%d').date() 
+        else:
+            delivery_from_siemens = None
+
+        if dict['p12_and_zip'] != ''  and  datetime.strptime(dict['p12_and_zip'], '%Y-%m-%d'):
+            p12_and_zip = datetime.strptime(dict['p12_and_zip'], '%Y-%m-%d').date() 
+        else:
+            p12_and_zip = None
+
+        if dict['moved_to_server'] != ''  and  datetime.strptime(dict['moved_to_server'], '%Y-%m-%d'):
+            moved_to_server = datetime.strptime(dict['moved_to_server'], '%Y-%m-%d').date() 
+        else:
+            moved_to_server = None
+
+        if dict['implemented'] != ''  and  datetime.strptime(dict['implemented'], '%Y-%m-%d'):
+            implemented = datetime.strptime(dict['implemented'], '%Y-%m-%d').date() 
+        else:
+            implemented = None
+
+        if dict['deleted_gm4web'] != ''  and  datetime.strptime(dict['deleted_gm4web'], '%Y-%m-%d'):
+            deleted_gm4web = datetime.strptime(dict['deleted_gm4web'], '%Y-%m-%d').date() 
+        else:
+            deleted_gm4web = None
+
+        if dict['evidence_in_ticket'] != ''  and  datetime.strptime(dict['evidence_in_ticket'], '%Y-%m-%d'):
+            evidence_in_ticket = datetime.strptime(dict['evidence_in_ticket'], '%Y-%m-%d').date() 
+        else:
+            evidence_in_ticket = None
+            
         if dict['completed'] == '':
             dict['completed'] = None
         if dict['worker'] == '':
@@ -423,30 +412,28 @@ def save_new_certificate():
         if dict['notes'] == '':
             dict['notes'] = None
 
-        # for item in dict:
-        #     print item
-
         completed = dict['completed']
         worker =  dict['worker']
         team =  dict['team']
-        has_to_be_replaced_before = dict['has_to_be_replaced_before']
-        expiration_date = dict['expiration_date']
         ticket_number = dict['ticket_number']
         certificate = dict['cn']
         server_name = dict['server_name']
         web_type = dict['web_type']
         type = dict['type']
-        mail_to_co = dict['mail_to_co']
-        csr = dict['csr']
-        answer_co = dict['answer_co']
-        order_certificate = dict['order_certificate']
-        delivery_from_siemens = dict['delivery_from_siemens']
-        p12_and_zip = dict['p12_and_zip']
-        moved_to_server = dict['moved_to_server']
-        implemented = dict['implemented']
-        deleted_gm4web = dict['deleted_gm4web']
-        evidence_in_ticket = dict['evidence_in_ticket']
         notes = dict['notes']
+        #has_to_be_replaced_before = dict['has_to_be_replaced_before']
+        #expiration_date = dict['expiration_date']
+        # #mail_to_co = dict['mail_to_co']
+        #csr = dict['csr']
+        #answer_co = dict['answer_co']
+        #order_certificate = dict['order_certificate']
+        #delivery_from_siemens = dict['delivery_from_siemens']
+        #p12_and_zip = dict['p12_and_zip']
+        #moved_to_server = dict['moved_to_server']
+        #implemented = dict['implemented']
+        #deleted_gm4web = dict['deleted_gm4web']
+        #evidence_in_ticket = dict['evidence_in_ticket']
+        
 
         obj = db.session.query(Certificates).order_by(Certificates.id.desc()).first()
         if obj is None:
