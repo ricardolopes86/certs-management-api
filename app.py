@@ -1,4 +1,4 @@
-
+#!venv/bin/python
 import sqlite3
 import json
 from flask import Flask, jsonify, g, request, abort, render_template, redirect, url_for, flash

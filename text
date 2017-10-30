@@ -323,3 +323,11 @@ def query_db_all():
             evidence_in_ticket =  datetime.date(int(evidence_in_ticket[0]),int(evidence_in_ticket[1]),int(evidence_in_ticket[2]))
         else:
             evidence_in_ticket = None
+
+
+Add package metadata to application
+Test and build consistency
+Add a builder service
+Build and publish a Python wheels
+
+146.254.160.65

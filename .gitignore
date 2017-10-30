@@ -1,3 +1,6 @@
 flask/
 flask.old/
-*.db
+certificates.db
+venv/
+certificates_management.egg-info/
+dist/
