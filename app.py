@@ -1,4 +1,3 @@
-#!venv/bin/python
 import sqlite3
 import json
 from flask import Flask, jsonify, g, request, abort, render_template, redirect, url_for, flash
@@ -11,6 +10,7 @@ app = Flask(__name__)
 app.secret_key = 'certificates-management'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///certificates.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 #app.config['SQLALCHEMY_ECHO'] = True
 
 
