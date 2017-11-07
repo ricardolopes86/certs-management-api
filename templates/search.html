@@ -111,11 +111,11 @@
                 <tr>
                     <input type="hidden" value="{{item.id}}" name="id">
                     <td style="white-space: nowrap;">
-                        <a href="/edit/certificate/{{item.id}}" class="btn btn-primary btn-sm fa fa-pencil-square-o" aria-hidden="true" data-toggle="tooltip"
+                        <a href="/edit/certificate/{{item.id}}" class="confirmation btn btn-primary btn-sm fa fa-pencil-square-o" aria-hidden="true" data-toggle="tooltip"
                             data-placement="top" title="Edit"></a>
-                        <a href="/delete/certificate/{{item.id}}" class="btn btn-danger btn-sm fa fa-trash-o" aria-hidden="true" data-toggle="tooltip"
+                        <a href="/delete/certificate/{{item.id}}" class="confirmation btn btn-danger btn-sm fa fa-trash-o" aria-hidden="true" data-toggle="tooltip"
                             data-placement="top" title="Delete"></a>
-                        <a href="/complete/certificate/{{item.id}}" class="btn btn-success btn-sm fa fa-check-square-o" aria-hidden="true" data-toggle="tooltip"
+                        <a href="/complete/certificate/{{item.id}}" class="confirmation btn btn-success btn-sm fa fa-check-square-o" aria-hidden="true" data-toggle="tooltip"
                             data-placement="top" title="Mark as completed"></a>
                     </td>
                     <td>{{item.completed}}</td>
@@ -163,6 +163,11 @@
     <script src="/static/js/jquery-3.2.1.slim.min.js"></script>
     <script src="/static/js/popper.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
+    <script>
+        $('.confirmation').on('click', function () {
+            return confirm('Are you sure?');
+        });
+    </script>
 
 </body>
 
