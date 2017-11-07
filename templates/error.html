@@ -16,25 +16,38 @@
 
 <body>
   <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-    <a class="navbar-brand" href="/"><img src="/static/img/image.png" alt="Certificate Management" height="32px"/></a>
+    <a class="navbar-brand" href="/">
+      <img src="/static/img/image.png" alt="Certificate Management" height="32px" />
+    </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse"
       aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="/"> <i class="fa fa-map-marker" aria-hidden="true"></i> Home
-                <span class="sr-only">(current)</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/add/new"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Add New Certificate</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/list/all"><i class="fa fa-list-alt" aria-hidden="true"></i> Show All Certificates</a>
-            </li>
-          </ul>
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">
+            <i class="fa fa-map-marker" aria-hidden="true"></i> Home
+            <span class="sr-only">(current)</span>
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-check" aria-hidden="true"></i> Add New
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="/add/new">
+              <i class="fa fa-plus" aria-hidden="true"></i> Add New Certificate</a>
+            <a class="dropdown-item" href="/upload">
+              <i class="fa fa-upload" aria-hidden="true"></i> Import CSV</a>
+          </div>
+
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/list/all">
+            <i class="fa fa-list-alt" aria-hidden="true"></i> Show All Certificates</a>
+        </li>
+      </ul>
       <form class="form-inline mt-2 mt-md-0" action="/search">
         <input class="form-control mr-sm-2" type="text" name="search_text" placeholder="Search" aria-label="Search">
         <label class="custom-control custom-radio">
@@ -70,10 +83,10 @@
 
   <!-- Bootstrap core JavaScript
     ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/static/js/jquery-3.2.1.slim.min.js"></script>
-    <script src="/static/js/popper.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="/static/js/jquery-3.2.1.slim.min.js"></script>
+  <script src="/static/js/popper.min.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
 </body>
 
 </html>

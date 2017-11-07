@@ -33,19 +33,30 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <a class="nav-link" href="/"> <i class="fa fa-map-marker" aria-hidden="true"></i> Home
+          <a class="nav-link" href="/">
+            <i class="fa fa-map-marker" aria-hidden="true"></i> Home
             <span class="sr-only">(current)</span>
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/add/new"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Add New Certificate</a>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-check" aria-hidden="true"></i> Add New
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="/add/new">
+              <i class="fa fa-plus" aria-hidden="true"></i> Add New Certificate</a>
+            <a class="dropdown-item" href="/upload">
+              <i class="fa fa-upload" aria-hidden="true"></i> Import CSV</a>
+          </div>
+
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/list/all"><i class="fa fa-list-alt" aria-hidden="true"></i> Show All Certificates</a>
+          <a class="nav-link" href="/list/all">
+            <i class="fa fa-list-alt" aria-hidden="true"></i> Show All Certificates</a>
         </li>
       </ul>
-      <form class="form-inline mt-2 mt-md-0" action="/search" method="post">
-        <input class="form-control mr-sm-2" type="text" name="search_text" id="search_text" placeholder="Search" aria-label="Search">
+      <form class="form-inline mt-2 mt-md-0" action="/search">
+        <input class="form-control mr-sm-2" type="text" name="search_text" placeholder="Search" aria-label="Search">
         <label class="custom-control custom-radio">
           <input id="radio1" name="criteria" type="radio" class="custom-control-input" value="worker">
           <span class="custom-control-indicator"></span>
@@ -57,12 +68,12 @@
           <span class="custom-control-description text-white">CN</span>
         </label>
         <label class="custom-control custom-radio">
-          <input id="radio3" name="criteria" type="radio" class="custom-control-input" value="not_completed" onclick="disableSearch()">
+          <input id="radio3" name="criteria" type="radio" class="custom-control-input" value="not_completed">
           <span class="custom-control-indicator"></span>
           <span class="custom-control-description text-white">Not Completed</span>
         </label>
         <label class="custom-control custom-radio">
-          <input id="radio4" name="criteria" type="radio" class="custom-control-input" value="completed" onclick="disableSearch()">
+          <input id="radio4" name="criteria" type="radio" class="custom-control-input" value="completed">
           <span class="custom-control-indicator"></span>
           <span class="custom-control-description text-white">Completed</span>
         </label>

@@ -1,18 +1,24 @@
 #!venv/bin/python
 import sqlite3
 import json
+import os
+import csv
 from flask import Flask, jsonify, g, request, abort, render_template, redirect, url_for, flash
 from flask_sqlalchemy import Model, SQLAlchemy
 from sqlalchemy import text, and_
 from datetime import datetime, timedelta
+from werkzeug import secure_filename
+
 
 app = Flask(__name__)
 
 app.secret_key = 'certificates-management'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///certificates.db'
+app.config['UPLOAD_FOLDER'] = 'uploads'
 #app.config['SQLALCHEMY_ECHO'] = True
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 db = SQLAlchemy(app)
 
@@ -41,8 +47,7 @@ class Certificates(db.Model):
     evidence_in_ticket = db.Column(db.Date(), nullable=True)
     notes = db.Column(db.Text, nullable=True)
 
-    def __init__(self,id,completed,worker,team,has_to_be_replaced_before,expiration_date,ticket_number,certificate,server_name,web_type,type,mail_to_co,csr,answer_co,order_certificate,delivery_from_siemens,p12_and_zip,moved_to_server,implemented,deleted_gm4web,evidence_in_ticket,notes):
-        self.id = id
+    def __init__(self,completed,worker,team,has_to_be_replaced_before,expiration_date,ticket_number,certificate,server_name,web_type,type,mail_to_co,csr,answer_co,order_certificate,delivery_from_siemens,p12_and_zip,moved_to_server,implemented,deleted_gm4web,evidence_in_ticket,notes):
         self.completed = completed
         self.worker = worker
         self.team = team
@@ -64,6 +69,8 @@ class Certificates(db.Model):
         self.deleted_gm4web = deleted_gm4web
         self.evidence_in_ticket = evidence_in_ticket
         self.notes = notes
+
+db.create_all()
 
 def month_string_to_number(string):
     m = {
@@ -92,42 +99,6 @@ def month_string_to_number(string):
 def not_found(error):
     return render_template('error.html')
 
-def create_table():
-    try:
-        with sqlite3.connect('certificates.db') as con:
-            cur = con.cursor()
-            cur.execute('''CREATE TABLE IF NOT EXISTS certificates (
-                            id INTEGER PRIMARY KEY NOT NULL,
-                            completed BOOLEAN,
-                            worker VARCHAR(255) NOT NULL,
-                            team VARCHAR(255),
-                            has_to_be_replaced_before DATE,
-                            expiration_date DATE,
-                            ticket_number VARCHAR(255),
-                            certificate VARCHAR(255),
-                            server_name VARCHAR(255),
-                            web_type VARCHAR(255),
-                            type VARCHAR(255),
-                            mail_to_co DATE,
-                            csr DATE,
-                            answer_co DATE,
-                            order_certificate DATE,
-                            delivery_from_siemens DATE,
-                            p12_and_zip DATE,
-                            moved_to_server DATE,
-                            implemented DATE,
-                            deleted_gm4web DATE,
-                            evidence_in_ticket DATE,
-                            notes TEXT);
-                            ''')
-            con.commit()
-    except sqlite3.OperationalError, msg:
-        print msg
-        con.rollback()
-    finally:
-        con.close()
-
-create_table()
 @app.route('/', methods=['GET'])
 def index():
     today = datetime.now()
@@ -142,7 +113,7 @@ def index():
     return render_template('index.html', result=certificates)
 
 def insert_db(data):
-    certificate = Certificates(data['id'],data['completed'],data['worker'],data['team'],data['has_to_be_replaced_before'],data['expiration_date'],data['ticket_number'],data['certificate'],data['server_name'],data['web_type'],data['type'],data['mail_to_co'],data['csr'],data['answer_co'],data['order_certificate'],data['delivery_from_siemens'],data['p12_and_zip'],data['moved_to_server'],data['implemented'],data['deleted_gm4web'],data['evidence_in_ticket'],data['notes'])
+    certificate = Certificates(data['completed'],data['worker'],data['team'],data['has_to_be_replaced_before'],data['expiration_date'],data['ticket_number'],data['certificate'],data['server_name'],data['web_type'],data['type'],data['mail_to_co'],data['csr'],data['answer_co'],data['order_certificate'],data['delivery_from_siemens'],data['p12_and_zip'],data['moved_to_server'],data['implemented'],data['deleted_gm4web'],data['evidence_in_ticket'],data['notes'])
     db.session.add(certificate)
     db.session.commit()
 
@@ -421,26 +392,14 @@ def save_new_certificate():
         web_type = dict['web_type']
         type = dict['type']
         notes = dict['notes']
-        #has_to_be_replaced_before = dict['has_to_be_replaced_before']
-        #expiration_date = dict['expiration_date']
-        # #mail_to_co = dict['mail_to_co']
-        #csr = dict['csr']
-        #answer_co = dict['answer_co']
-        #order_certificate = dict['order_certificate']
-        #delivery_from_siemens = dict['delivery_from_siemens']
-        #p12_and_zip = dict['p12_and_zip']
-        #moved_to_server = dict['moved_to_server']
-        #implemented = dict['implemented']
-        #deleted_gm4web = dict['deleted_gm4web']
-        #evidence_in_ticket = dict['evidence_in_ticket']
         
 
-        obj = db.session.query(Certificates).order_by(Certificates.id.desc()).first()
-        if obj is None:
-            id = 1
-        else:
-            id = obj.id+1
-        certificate = Certificates(id,
+        # obj = db.session.query(Certificates).order_by(Certificates.id.desc()).first()
+        # if obj is None:
+        #     id = 1
+        # else:
+        #     id = obj.id+1
+        certificate = Certificates(
             completed=completed,
             worker=worker,
             team=team,
@@ -523,5 +482,148 @@ def site_map():
             links.append((url, rule.endpoint))
     # links is now a list of url, endpoint tuples
     return render_template('site-map.html', links=links)
+
+@app.route('/upload')
+def upload_file():
+   return render_template('upload.html')
+	
+@app.route('/uploader', methods = ['GET', 'POST'])
+def uploader_file():
+   if request.method == 'POST':
+      f = request.files['file']
+      filename = secure_filename(f.filename)
+      full_file_name = os.path.join(dir_path,app.config['UPLOAD_FOLDER'],filename)
+      f.save(full_file_name)
+      #f.save(secure_filename(f.filename))
+      flash("File uploaded successfully!","success")
+      return render_template('import-csv.html', full_file_name=full_file_name)
+
+@app.route('/import/csv', methods=['POST'])
+def import_csv():
+    data = {}
+    filename = request.form['file_name']
+    with open(filename, 'rb') as f:
+        dr = csv.reader(f)
+        for row in dr:
+            try:
+                data['completed'] = row[0]
+            except IndexError:
+                data['completed'] = None
+
+            try:
+                data['worker'] = row[1]
+            except IndexError: 
+                data['worker'] = None
+
+            try:
+                data['team'] = row[2]
+            except IndexError:
+                data['team'] = None
+            try:
+                data['has_to_be_replaced_before'] = row[3]
+            except IndexError:
+                data['has_to_be_replaced_before'] = None
+            try:
+                data['expiration_date'] = row[4]
+            except IndexError:
+                data['expiration_date'] = None
+            try:
+                data['ticket_number'] = row[5]
+            except IndexError:
+                data['ticket_number'] = None
+            try:
+                data['certificate'] = row[6]
+            except IndexError:
+                data['certificate'] = None
+            try:
+                data['server_name'] = row[7]
+            except IndexError:
+                data['server_name'] = None
+            try:
+                data['web_type'] = row[8]
+            except IndexError:
+                data['web_type'] = None
+            try:
+                data['type'] = row[9]
+            except IndexError:
+                data['type'] = None
+            try:
+                data['mail_to_co'] = row[10]
+            except IndexError:
+                data['mail_to_co'] = None
+            try:
+                data['csr'] = row[11]
+            except IndexError:
+                data['csr'] = None
+            try:
+                data['answer_co'] = row[12]
+            except IndexError:
+                data['answer_co'] = None
+            try:
+                data['order_certificate'] = row[13]
+            except IndexError:
+                data['order_certificate'] = None
+            try:
+                data['delivery_from_siemens'] = row[14]
+            except IndexError:
+                data['delivery_from_siemens'] = None
+            try:
+                data['p12_and_zip'] = row[15]
+            except IndexError:
+                data['p12_and_zip'] = None
+            try:
+                data['moved_to_server'] = row[16]
+            except IndexError:
+                data['moved_to_server'] = None
+            try:
+                data['implemented'] = row[17]
+            except IndexError:
+                data['implemented'] = None
+            try:
+                data['deleted_gm4web'] = row[18]
+            except IndexError:
+                data['deleted_gm4web'] = None
+            try:
+                data['evidence_in_ticket'] = row[19]
+            except IndexError:
+                data['evidence_in_ticket'] = None
+            try:
+                data['notes'] = row[20]
+            except IndexError:
+                data['notes'] = None
+
+            if data['has_to_be_replaced_before'] == '':
+                data['has_to_be_replaced_before'] = None
+            if data['expiration_date'] == '':
+                data['expiration_date'] = None
+            if data['mail_to_co'] == '':
+                data['mail_to_co'] = None
+            if data['csr'] == '':
+                data['csr'] = None
+            if data['answer_co'] == '':
+                data['answer_co'] = None
+            if data['order_certificate'] == '':
+                data['order_certificate'] = None
+            if data['delivery_from_siemens'] == '':
+                data['delivery_from_siemens'] = None
+            if data['p12_and_zip'] == '':
+                data['p12_and_zip'] = None
+            if data['moved_to_server'] == '':
+                data['moved_to_server'] = None
+            if data['implemented'] == '':
+                data['implemented'] = None
+            if data['deleted_gm4web'] == '':
+                data['deleted_gm4web'] = None
+            if data['evidence_in_ticket'] == '':
+                data['evidence_in_ticket'] = None
+            
+            certificate = Certificates(**data)
+            db.session.add(certificate)
+            db.session.commit()
+            
+        
+        flash("Import successfull!",'success')
+    return redirect(url_for('index'))
+
 if __name__ == '__main__':
     app.run()

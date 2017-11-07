@@ -1,12 +1,23 @@
 Our record indicates that your Trust Center Server ID (TCID) certificate for monitor.eps.siemens.com will expire on Oct 30, 2017 9:20:59 AM. 
 
+
+<li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Dropdown link
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="#">Action</a>
+          <a class="dropdown-item" href="#">Another action</a>
+          <a class="dropdown-item" href="#">Something else here</a>
+        </div>
+      </li>
+      
 id,
 completed,
 worker,
 team,
 has_to_be_replaced_before,
 expiration_date,
-
 ticket_number,
 certificate,
 server_name,
@@ -23,6 +34,41 @@ implemented,
 deleted_gm4web,
 evidence_in_ticket,
 notes
+
+def create_table():
+    try:
+        with sqlite3.connect('certificates.db') as con:
+            cur = con.cursor()
+            cur.execute('''CREATE TABLE IF NOT EXISTS certificates (
+                            id INTEGER PRIMARY KEY NOT NULL,
+                            completed BOOLEAN,
+                            worker VARCHAR(255) NOT NULL,
+                            team VARCHAR(255),
+                            has_to_be_replaced_before DATE,
+                            expiration_date DATE,
+                            ticket_number VARCHAR(255),
+                            certificate VARCHAR(255),
+                            server_name VARCHAR(255),
+                            web_type VARCHAR(255),
+                            type VARCHAR(255),
+                            mail_to_co DATE,
+                            csr DATE,
+                            answer_co DATE,
+                            order_certificate DATE,
+                            delivery_from_siemens DATE,
+                            p12_and_zip DATE,
+                            moved_to_server DATE,
+                            implemented DATE,
+                            deleted_gm4web DATE,
+                            evidence_in_ticket DATE,
+                            notes TEXT);
+                            ''')
+            con.commit()
+    except sqlite3.OperationalError, msg:
+        print msg
+        con.rollback()
+    finally:
+        con.close()
 
 [{'order_certificate': u'None', 
 'answer_co': u'None', 
