@@ -331,3 +331,9 @@ Add a builder service
 Build and publish a Python wheels
 
 146.254.160.65
+
+('/list/all', 'list_all_certs') 
+('/add/new', 'add_new') 
+('/site-map', 'site_map') 
+('/search', 'search') 
+('/', 'index') 
