@@ -125,6 +125,7 @@ def add_new():
 @app.route('/add/new/parse', methods=['POST'])
 def parse_new():
     text = request.form['text_from_mail']
+    
     if text == '' or text == ' ' or text == None:
         return render_template('parse.html')
     else:
@@ -132,17 +133,34 @@ def parse_new():
         if text[0] != 'Our':
             return render_template('parse.html')
         else:
-            cert_type = text[9][1:-1]
-            cert_cn = text[12]
-            cert_exp_month = text[16]
-            cert_exp_day = text[17][:-1]
-            cert_exp_year = text[18]
-            exp_date = cert_exp_year+"-"+month_string_to_number(cert_exp_month)+"-"+cert_exp_day
-            data = {}
-            data['cn_type'] = cert_type
-            data['cn'] = cert_cn
-            data['expiration_date'] = exp_date
-            return render_template('parse.html', data=data)
+            try:
+                if text[5] == 'Trust':
+                    cert_type = text[9][1:-1]
+                    cert_cn = text[12]
+                    cert_exp_month = text[16]
+                    cert_exp_day = text[17][:-1]
+                    cert_exp_year = text[18]
+                    exp_date = cert_exp_year+"-"+month_string_to_number(cert_exp_month)+"-"+cert_exp_day
+                    data = {}
+                    data['cn_type'] = cert_type
+                    data['cn'] = cert_cn
+                    data['expiration_date'] = exp_date
+                    return render_template('parse.html', data=data)
+                else:
+                    cert_type = text[10][1:-1]
+                    cert_cn = text[13]
+                    cert_exp_month = text[17]
+                    cert_exp_day = text[18][:-1]
+                    cert_exp_year = text[19]
+                    exp_date = cert_exp_year+"-"+month_string_to_number(cert_exp_month)+"-"+cert_exp_day
+                    data = {}
+                    data['cn_type'] = cert_type
+                    data['cn'] = cert_cn
+                    data['expiration_date'] = exp_date
+                    return render_template('parse.html', data=data)
+            except Exception as e:
+                flash("Error during parse: " + str(e), 'error')
+                return render_template('parse.html')
 
 @app.route('/edit/certificate/<int:id>')
 def edit_certificate(id):
