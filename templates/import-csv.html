@@ -87,15 +87,20 @@
             </ul>
         </div>
         {% endif %} {% endwith %}
+        
         <div class="card">
             <div class="card-body">
                 <form class="form-inline" action="{{url_for('import_csv')}}" method="POST" enctype="multipart/form-data">
 
                     <input type="hidden" name="file_name" value="{{full_file_name}}" class="form-control">
 
-                    <input class="btn btn-info" type="submit" value="Import" />
+                    <input class="btn btn-info" type="submit" value="Import" onclick="makeProgress()" />
                 </form>
             </div>
+        </div>
+        <div class="progress" style="height: 30px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0"
+                aria-valuemax="100" style="width: 0%"></div>
         </div>
     </main>
 
@@ -106,6 +111,17 @@
     <script src="/static/js/jquery-3.2.1.slim.min.js"></script>
     <script src="/static/js/popper.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        var i = 0;
+        function makeProgress(){
+            if(i < 100){
+                i = i + 1;
+                $(".progress-bar").css("width", i + "%").text(i + " %");
+            }
+            // Wait for sometime before running this script again
+            setTimeout("makeProgress()", 100);
+        }
+    </script>
 </body>
 
 </html>

@@ -3,6 +3,7 @@ import sqlite3
 import json
 import os
 import csv
+import codecs
 from flask import Flask, jsonify, g, request, abort, render_template, redirect, url_for, flash
 from flask_sqlalchemy import Model, SQLAlchemy
 from sqlalchemy import text, and_
@@ -494,135 +495,202 @@ def uploader_file():
       filename = secure_filename(f.filename)
       full_file_name = os.path.join(dir_path,app.config['UPLOAD_FOLDER'],filename)
       f.save(full_file_name)
-      #f.save(secure_filename(f.filename))
+      if '\0' in open(full_file_name).read():
+          reader = csv.reader(x.replace('\0', '') for x in mycsv)
+      else:
+          print "No NULL bytes found"
       flash("File uploaded successfully!","success")
       return render_template('import-csv.html', full_file_name=full_file_name)
 
 @app.route('/import/csv', methods=['POST'])
 def import_csv():
     data = {}
+    i = 0
     filename = request.form['file_name']
-    with open(filename, 'rb') as f:
-        dr = csv.reader(f)
-        for row in dr:
-            try:
-                data['completed'] = row[0]
-            except IndexError:
-                data['completed'] = None
+    try:
+        with codecs.open(filename, "rb", encoding='utf-8', errors='ignore') as f:
+            fdata = f.read().splitlines()
+            for row in fdata:
+                i += 1
+                row = row.split(',')
+                print row
+                try:
+                    data['completed'] = row[0]
+                except IndexError:
+                    data['completed'] = ''
 
-            try:
-                data['worker'] = row[1]
-            except IndexError: 
-                data['worker'] = None
+                try:
+                    data['worker'] = row[1]
+                except IndexError: 
+                    data['worker'] = ''
 
-            try:
-                data['team'] = row[2]
-            except IndexError:
-                data['team'] = None
-            try:
-                data['has_to_be_replaced_before'] = row[3]
-            except IndexError:
-                data['has_to_be_replaced_before'] = None
-            try:
-                data['expiration_date'] = row[4]
-            except IndexError:
-                data['expiration_date'] = None
-            try:
-                data['ticket_number'] = row[5]
-            except IndexError:
-                data['ticket_number'] = None
-            try:
-                data['certificate'] = row[6]
-            except IndexError:
-                data['certificate'] = None
-            try:
-                data['server_name'] = row[7]
-            except IndexError:
-                data['server_name'] = None
-            try:
-                data['web_type'] = row[8]
-            except IndexError:
-                data['web_type'] = None
-            try:
-                data['type'] = row[9]
-            except IndexError:
-                data['type'] = None
-            try:
-                data['mail_to_co'] = row[10]
-            except IndexError:
-                data['mail_to_co'] = None
-            try:
-                data['csr'] = row[11]
-            except IndexError:
-                data['csr'] = None
-            try:
-                data['answer_co'] = row[12]
-            except IndexError:
-                data['answer_co'] = None
-            try:
-                data['order_certificate'] = row[13]
-            except IndexError:
-                data['order_certificate'] = None
-            try:
-                data['delivery_from_siemens'] = row[14]
-            except IndexError:
-                data['delivery_from_siemens'] = None
-            try:
-                data['p12_and_zip'] = row[15]
-            except IndexError:
-                data['p12_and_zip'] = None
-            try:
-                data['moved_to_server'] = row[16]
-            except IndexError:
-                data['moved_to_server'] = None
-            try:
-                data['implemented'] = row[17]
-            except IndexError:
-                data['implemented'] = None
-            try:
-                data['deleted_gm4web'] = row[18]
-            except IndexError:
-                data['deleted_gm4web'] = None
-            try:
-                data['evidence_in_ticket'] = row[19]
-            except IndexError:
-                data['evidence_in_ticket'] = None
-            try:
-                data['notes'] = row[20]
-            except IndexError:
-                data['notes'] = None
+                try:
+                    data['team'] = row[2]
+                except IndexError:
+                    data['team'] = ''
 
-            if data['has_to_be_replaced_before'] == '':
-                data['has_to_be_replaced_before'] = None
-            if data['expiration_date'] == '':
-                data['expiration_date'] = None
-            if data['mail_to_co'] == '':
-                data['mail_to_co'] = None
-            if data['csr'] == '':
-                data['csr'] = None
-            if data['answer_co'] == '':
-                data['answer_co'] = None
-            if data['order_certificate'] == '':
-                data['order_certificate'] = None
-            if data['delivery_from_siemens'] == '':
-                data['delivery_from_siemens'] = None
-            if data['p12_and_zip'] == '':
-                data['p12_and_zip'] = None
-            if data['moved_to_server'] == '':
-                data['moved_to_server'] = None
-            if data['implemented'] == '':
-                data['implemented'] = None
-            if data['deleted_gm4web'] == '':
-                data['deleted_gm4web'] = None
-            if data['evidence_in_ticket'] == '':
-                data['evidence_in_ticket'] = None
-            
-            certificate = Certificates(**data)
-            db.session.add(certificate)
-            db.session.commit()
+                try:
+                    data['has_to_be_replaced_before'] = row[3]
+                except IndexError:
+                    data['has_to_be_replaced_before'] = ''
+
+                try:
+                    data['expiration_date'] = row[4]
+                except IndexError:
+                    data['expiration_date'] = ''
+
+                try:
+                    data['ticket_number'] = row[5]
+                except IndexError:
+                    data['ticket_number'] = ''
+
+                try:
+                    data['certificate'] = row[6]
+                except IndexError:
+                    data['certificate'] = ''
+
+                try:
+                    data['server_name'] = row[7]
+                except IndexError:
+                    data['server_name'] = ''
+
+                try:
+                    data['web_type'] = row[8]
+                except IndexError:
+                    data['web_type'] = ''
+
+                try:
+                    data['type'] = row[9]
+                except IndexError:
+                    data['type'] = ''
+
+                try:
+                    data['mail_to_co'] = row[10]
+                except IndexError:
+                    data['mail_to_co'] = ''
+
+                try:
+                    data['csr'] = row[11]
+                except IndexError:
+                    data['csr'] = ''
+
+                try:
+                    data['answer_co'] = row[12]
+                except IndexError:
+                    data['answer_co'] = ''
+
+                try:
+                    data['order_certificate'] = row[13]
+                except IndexError:
+                    data['order_certificate'] = ''
+
+                try:
+                    data['delivery_from_siemens'] = row[14]
+                except IndexError:
+                    data['delivery_from_siemens'] = ''
+
+                try:
+                    data['p12_and_zip'] = row[15]
+                except IndexError:
+                    data['p12_and_zip'] = ''
+
+                try:
+                    data['moved_to_server'] = row[16]
+                except IndexError:
+                    data['moved_to_server'] = ''
+
+                try:
+                    data['implemented'] = row[17]
+                except IndexError:
+                    data['implemented'] = ''
+
+                try:
+                    data['deleted_gm4web'] = row[18]
+                except IndexError:
+                    data['deleted_gm4web'] = ''
+
+                try:
+                    data['evidence_in_ticket'] = row[19]
+                except IndexError:
+                    data['evidence_in_ticket'] = ''
+
+                try:
+                    data['notes'] = row[20]
+                except IndexError:
+                    data['notes'] = ''
+
+                if data['has_to_be_replaced_before'] == '':
+                    data['has_to_be_replaced_before'] = None
+                else:
+                    data['has_to_be_replaced_before'] = datetime.strptime(data['has_to_be_replaced_before'], '%Y-%m-%d').date()
+
+                if data['expiration_date'] == '':
+                    data['expiration_date'] = None
+                else:
+                    data['expiration_date'] = datetime.strptime(data['expiration_date'], '%Y-%m-%d').date()
+
+                if data['mail_to_co'] == '':
+                    data['mail_to_co'] = None
+                else:
+                    data['mail_to_co'] = datetime.strptime(data['mail_to_co'], '%Y-%m-%d').date()
+
+                if data['csr'] == '':
+                    data['csr'] = None
+                else:
+                    data['csr'] = datetime.strptime(data['csr'], '%Y-%m-%d').date()
+
+                if data['answer_co'] == '':
+                    data['answer_co'] = None
+                else:
+                    data['answer_co'] = datetime.strptime(data['answer_co'], '%Y-%m-%d').date()
+
+                if data['order_certificate'] == '':
+                    data['order_certificate'] = None
+                else:
+                    data['order_certificate'] = datetime.strptime(data['order_certificate'], '%Y-%m-%d').date()
+
+                if data['delivery_from_siemens'] == '':
+                    data['delivery_from_siemens'] = None
+                else:
+                    data['delivery_from_siemens'] = datetime.strptime(data['delivery_from_siemens'], '%Y-%m-%d').date()
+
+                if data['p12_and_zip'] == '':
+                    data['p12_and_zip'] = None
+                else:
+                    data['p12_and_zip'] = datetime.strptime(data['p12_and_zip'], '%Y-%m-%d').date()
+
+                if data['moved_to_server'] == '':
+                    data['moved_to_server'] = None
+                else:
+                    data['moved_to_server'] = datetime.strptime(data['moved_to_server'], '%Y-%m-%d').date()
+
+                if data['implemented'] == '':
+                    data['implemented'] = None
+                else:
+                    data['implemented'] = datetime.strptime(data['implemented'], '%Y-%m-%d').date()
+
+                if data['deleted_gm4web'] == '':
+                    data['deleted_gm4web'] = None
+                else:
+                    data['deleted_gm4web'] = datetime.strptime(data['deleted_gm4web'], '%Y-%m-%d').date()
+
+                if data['evidence_in_ticket'] == '':
+                    data['evidence_in_ticket'] = None
+                else:
+                    data['evidence_in_ticket'] = datetime.strptime(data['evidence_in_ticket'], '%Y-%m-%d').date()
+                
+                certificate = Certificates(**data)
+                db.session.add(certificate)
+                db.session.commit()
             
         
-        flash("Import successfull!",'success')
+        
+    except Exception as e:
+        print "Unexpected error:", e
+        flash("Line n: " + str(i) +". Error during import: " + str(e),'error')
+        return redirect(url_for('index'))
+   
+    flash("Import successfull!",'success')
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
