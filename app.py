@@ -457,8 +457,25 @@ def create_task():
 
 @app.route('/list/all', methods=['GET'])
 def list_all_certs():
+    sort = request.args.get('sort')
+    field_to_sort = request.args.get('field')
 
-    certificate = db.session.query(Certificates).all()
+    if sort == 'asc' and field_to_sort == 'expiration':
+        certificate = db.session.query(Certificates).order_by(Certificates.expiration_date.asc()).all()
+    elif sort == 'desc' and field_to_sort == 'expiration':
+        certificate = db.session.query(Certificates).order_by(Certificates.expiration_date.desc()).all()
+    elif sort == 'asc' and field_to_sort == 'replace':
+        certificate = db.session.query(Certificates).order_by(Certificates.has_to_be_replaced_before.asc()).all()
+    elif sort == 'desc'  and field_to_sort == 'replace':
+        certificate = db.session.query(Certificates).order_by(Certificates.has_to_be_replaced_before.desc()).all()
+    if sort == 'asc' and field_to_sort == 'worker':
+        certificate = db.session.query(Certificates).order_by(Certificates.worker.asc()).all()
+    elif sort == 'desc' and field_to_sort == 'worker':
+        certificate = db.session.query(Certificates).order_by(Certificates.worker.desc()).all()
+    else:
+        certificate = db.session.query(Certificates).all()
+
+    
     for item in certificate:
         item.completed = '' if item.completed == None else item.completed
         item.worker =  '' if item.worker == None else item.worker
