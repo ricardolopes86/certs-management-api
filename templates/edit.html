@@ -46,9 +46,17 @@
                         <span class="sr-only">(current)</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/add/new">
-                        <i class="fa fa-plus-square-o" aria-hidden="true"></i> Add New Certificate</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-check" aria-hidden="true"></i> Add New
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="/add/new">
+                            <i class="fa fa-plus" aria-hidden="true"></i> Add New Certificate</a>
+                        <a class="dropdown-item" href="/upload">
+                            <i class="fa fa-upload" aria-hidden="true"></i> Import CSV</a>
+                    </div>
+
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/list/all">
@@ -92,7 +100,7 @@
                             <label for="completed" class="col-form-label">Completed</label>
                             <select class="form-control" id="completed" name="completed">
                                 {% for key in completed_states %}
-                                <option value="{{key}}" {% if key == certificate.completed %} selected="selected" {% endif %}>
+                                <option value="{{key}}" {% if key==c ertificate.completed %} selected="selected" {% endif %}>
                                     {{key}}
                                 </option>
                                 {% endfor %}
@@ -102,7 +110,7 @@
                             <label for="worker" class="col-form-label">Select Workder</label>
                             <select class="form-control" id="worker" name="worker">
                                 {% for key in workers %}
-                                <option value="{{key}}" {% if key== certificate.worker %} selected="selected" {% endif %}>
+                                <option value="{{key}}" {% if key==c ertificate.worker %} selected="selected" {% endif %}>
                                     {{key}}
                                 </option>
                                 {% endfor %}
@@ -153,8 +161,7 @@
                         </div>
                         <div class="form-group col-md-2">
                             <label for="csr" class="col-form-label">CSR Created At</label>
-                            <input class="form-control" type="text" value="{{certificate.csr}}" id="csr" name="csr" data-provide="datepicker"
-                                data-date-format="yyyy-mm-dd">
+                            <input class="form-control" type="text" value="{{certificate.csr}}" id="csr" name="csr" data-provide="datepicker" data-date-format="yyyy-mm-dd">
                         </div>
                         <div class="form-group col-md-2">
                             <label for="answer_co" class="col-form-label">Answer From CO</label>
@@ -170,13 +177,13 @@
                         </div>
                         <div class="form-group col-md-2">
                             <label for="delivery_from_siemens" class="col-form-label">Delivered Date</label>
-                            <input class="form-control" type="text" value="{{certificate.delivery_from_siemens}}" id="delivery_from_siemens"
-                                name="delivery_from_siemens" data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                            <input class="form-control" type="text" value="{{certificate.delivery_from_siemens}}" id="delivery_from_siemens" name="delivery_from_siemens"
+                                data-provide="datepicker" data-date-format="yyyy-mm-dd">
                         </div>
                         <div class="form-group col-md-2">
                             <label for="p12_and_zip" class="col-form-label">P12 and ZIP Created</label>
-                            <input class="form-control" type="text" value="{{certificate.p12_and_zip}}" id="p12_and_zip" name="p12_and_zip"
-                                data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                            <input class="form-control" type="text" value="{{certificate.p12_and_zip}}" id="p12_and_zip" name="p12_and_zip" data-provide="datepicker"
+                                data-date-format="yyyy-mm-dd">
                         </div>
                         <div class="form-group col-md-2">
                             <label for="moved_to_server" class="col-form-label">Moved to Server</label>
@@ -185,8 +192,8 @@
                         </div>
                         <div class="form-group col-md-2">
                             <label for="implemented" class="col-form-label">Implemented</label>
-                            <input class="form-control" type="text" value="{{certificate.implemented}}" id="implemented" name="implemented"
-                                data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                            <input class="form-control" type="text" value="{{certificate.implemented}}" id="implemented" name="implemented" data-provide="datepicker"
+                                data-date-format="yyyy-mm-dd">
                         </div>
                         <div class="form-group col-md-2">
                             <label for="deleted_gm4web" class="col-form-label">Deleted in GM4WEB</label>
