@@ -8,7 +8,6 @@
     <meta name="author" content="">
     <link rel="icon" href="/static/favicon.ico">
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
-    <link href="/static/css/jquery-ui.css" rel="stylesheet">
     <title>Certificate Management</title>
 
     <!-- Bootstrap core CSS -->
@@ -16,11 +15,7 @@
 
     <!-- Bootstrap Date-Picker Plugin -->
     <link rel="stylesheet" href="/static/css/bootstrap-datepicker.standalone.min.css" />
-    <script>
-        $('.datepicker').datepicker({
-            format: 'yyyy-mm-dd'
-        });
-    </script>
+    
 </head>
 
 <body>
@@ -318,14 +313,40 @@
             </div>
         </div>
         {% endif %}
+        
     </main>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/static/js/jquery-3.2.1.slim.min.js"></script>
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
     <script src="/static/js/popper.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('.datepicker').datepicker({
+                format: 'yyyy-mm-dd'
+            });
+            $('#cn').blur(function(){
+                var cnvalue = $('#cn').val();
+                $.ajax({
+                    url: '/search-existing-cn',
+                    data: $('form').serialize(),
+                    type: 'POST',
+                    success: function(response){
+                        if(response == "exists"){
+                            confirm("This CN already exists in the Database, would you like to continue?");
+                        }else{
+                            console.log('CN dont exists' + response);
+                        }
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

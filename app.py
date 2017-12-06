@@ -301,7 +301,7 @@ def search():
         if criteria == 'not_completed':
             items = db.session.query(Certificates).filter(Certificates.completed.like('No')).all()
         
-    print items
+    #print items
     return render_template('search.html', result=items)
 
 @app.route('/add/new/certificate/save', methods=['POST'])
@@ -506,6 +506,22 @@ def list_all_certs():
 
     return render_template('list_all.html',result=certificate)
 
+@app.route('/search-existing-cn', methods=['POST'])
+def search_existing_cn():
+    search_text = ''
+    result = ''
+    search_text = request.form['cn']
+    if search_text == '':
+        return result
+    else:
+        items = db.session.query(Certificates).filter(Certificates.certificate.like('''%'''+search_text+'''%''')).all()
+    
+    if len(items)>0:
+        result = 'exists'
+    else:
+        result = 'dont exist'
+    
+    return result
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
