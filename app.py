@@ -1,18 +1,28 @@
 import sqlite3
 import json
+import os
+import csv
+import codecs
 from flask import Flask, jsonify, g, request, abort, render_template, redirect, url_for, flash
 from flask_sqlalchemy import Model, SQLAlchemy
 from sqlalchemy import text, and_
 from datetime import datetime, timedelta
+from werkzeug import secure_filename
+
 
 app = Flask(__name__)
 
 app.secret_key = 'certificates-management'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///certificates.db'
+<<<<<<< HEAD
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+=======
+app.config['UPLOAD_FOLDER'] = 'uploads'
+>>>>>>> sort_feature
 #app.config['SQLALCHEMY_ECHO'] = True
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 db = SQLAlchemy(app)
 
@@ -41,8 +51,7 @@ class Certificates(db.Model):
     evidence_in_ticket = db.Column(db.Date(), nullable=True)
     notes = db.Column(db.Text, nullable=True)
 
-    def __init__(self,id,completed,worker,team,has_to_be_replaced_before,expiration_date,ticket_number,certificate,server_name,web_type,type,mail_to_co,csr,answer_co,order_certificate,delivery_from_siemens,p12_and_zip,moved_to_server,implemented,deleted_gm4web,evidence_in_ticket,notes):
-        self.id = id
+    def __init__(self,completed,worker,team,has_to_be_replaced_before,expiration_date,ticket_number,certificate,server_name,web_type,type,mail_to_co,csr,answer_co,order_certificate,delivery_from_siemens,p12_and_zip,moved_to_server,implemented,deleted_gm4web,evidence_in_ticket,notes):
         self.completed = completed
         self.worker = worker
         self.team = team
@@ -64,6 +73,8 @@ class Certificates(db.Model):
         self.deleted_gm4web = deleted_gm4web
         self.evidence_in_ticket = evidence_in_ticket
         self.notes = notes
+
+db.create_all()
 
 def month_string_to_number(string):
     m = {
@@ -92,42 +103,6 @@ def month_string_to_number(string):
 def not_found(error):
     return render_template('error.html')
 
-def create_table():
-    try:
-        with sqlite3.connect('certificates.db') as con:
-            cur = con.cursor()
-            cur.execute('''CREATE TABLE IF NOT EXISTS certificates (
-                            id INTEGER PRIMARY KEY NOT NULL,
-                            completed BOOLEAN,
-                            worker VARCHAR(255) NOT NULL,
-                            team VARCHAR(255),
-                            has_to_be_replaced_before DATE,
-                            expiration_date DATE,
-                            ticket_number VARCHAR(255),
-                            certificate VARCHAR(255),
-                            server_name VARCHAR(255),
-                            web_type VARCHAR(255),
-                            type VARCHAR(255),
-                            mail_to_co DATE,
-                            csr DATE,
-                            answer_co DATE,
-                            order_certificate DATE,
-                            delivery_from_siemens DATE,
-                            p12_and_zip DATE,
-                            moved_to_server DATE,
-                            implemented DATE,
-                            deleted_gm4web DATE,
-                            evidence_in_ticket DATE,
-                            notes TEXT);
-                            ''')
-            con.commit()
-    except sqlite3.OperationalError, msg:
-        print msg
-        con.rollback()
-    finally:
-        con.close()
-
-create_table()
 @app.route('/', methods=['GET'])
 def index():
     today = datetime.now()
@@ -142,7 +117,7 @@ def index():
     return render_template('index.html', result=certificates)
 
 def insert_db(data):
-    certificate = Certificates(data['id'],data['completed'],data['worker'],data['team'],data['has_to_be_replaced_before'],data['expiration_date'],data['ticket_number'],data['certificate'],data['server_name'],data['web_type'],data['type'],data['mail_to_co'],data['csr'],data['answer_co'],data['order_certificate'],data['delivery_from_siemens'],data['p12_and_zip'],data['moved_to_server'],data['implemented'],data['deleted_gm4web'],data['evidence_in_ticket'],data['notes'])
+    certificate = Certificates(data['completed'],data['worker'],data['team'],data['has_to_be_replaced_before'],data['expiration_date'],data['ticket_number'],data['certificate'],data['server_name'],data['web_type'],data['type'],data['mail_to_co'],data['csr'],data['answer_co'],data['order_certificate'],data['delivery_from_siemens'],data['p12_and_zip'],data['moved_to_server'],data['implemented'],data['deleted_gm4web'],data['evidence_in_ticket'],data['notes'])
     db.session.add(certificate)
     db.session.commit()
 
@@ -153,6 +128,7 @@ def add_new():
 @app.route('/add/new/parse', methods=['POST'])
 def parse_new():
     text = request.form['text_from_mail']
+    
     if text == '' or text == ' ' or text == None:
         return render_template('parse.html')
     else:
@@ -160,17 +136,34 @@ def parse_new():
         if text[0] != 'Our':
             return render_template('parse.html')
         else:
-            cert_type = text[9][1:-1]
-            cert_cn = text[12]
-            cert_exp_month = text[16]
-            cert_exp_day = text[17][:-1]
-            cert_exp_year = text[18]
-            exp_date = cert_exp_year+"-"+month_string_to_number(cert_exp_month)+"-"+cert_exp_day
-            data = {}
-            data['cn_type'] = cert_type
-            data['cn'] = cert_cn
-            data['expiration_date'] = exp_date
-            return render_template('parse.html', data=data)
+            try:
+                if text[5] == 'Trust':
+                    cert_type = text[9][1:-1]
+                    cert_cn = text[12]
+                    cert_exp_month = text[16]
+                    cert_exp_day = text[17][:-1]
+                    cert_exp_year = text[18]
+                    exp_date = cert_exp_year+"-"+month_string_to_number(cert_exp_month)+"-"+cert_exp_day
+                    data = {}
+                    data['cn_type'] = cert_type
+                    data['cn'] = cert_cn
+                    data['expiration_date'] = exp_date
+                    return render_template('parse.html', data=data)
+                else:
+                    cert_type = text[10][1:-1]
+                    cert_cn = text[13]
+                    cert_exp_month = text[17]
+                    cert_exp_day = text[18][:-1]
+                    cert_exp_year = text[19]
+                    exp_date = cert_exp_year+"-"+month_string_to_number(cert_exp_month)+"-"+cert_exp_day
+                    data = {}
+                    data['cn_type'] = cert_type
+                    data['cn'] = cert_cn
+                    data['expiration_date'] = exp_date
+                    return render_template('parse.html', data=data)
+            except Exception as e:
+                flash("Error during parse: " + str(e), 'error')
+                return render_template('parse.html')
 
 @app.route('/edit/certificate/<int:id>')
 def edit_certificate(id):
@@ -421,26 +414,14 @@ def save_new_certificate():
         web_type = dict['web_type']
         type = dict['type']
         notes = dict['notes']
-        #has_to_be_replaced_before = dict['has_to_be_replaced_before']
-        #expiration_date = dict['expiration_date']
-        # #mail_to_co = dict['mail_to_co']
-        #csr = dict['csr']
-        #answer_co = dict['answer_co']
-        #order_certificate = dict['order_certificate']
-        #delivery_from_siemens = dict['delivery_from_siemens']
-        #p12_and_zip = dict['p12_and_zip']
-        #moved_to_server = dict['moved_to_server']
-        #implemented = dict['implemented']
-        #deleted_gm4web = dict['deleted_gm4web']
-        #evidence_in_ticket = dict['evidence_in_ticket']
         
 
-        obj = db.session.query(Certificates).order_by(Certificates.id.desc()).first()
-        if obj is None:
-            id = 1
-        else:
-            id = obj.id+1
-        certificate = Certificates(id,
+        # obj = db.session.query(Certificates).order_by(Certificates.id.desc()).first()
+        # if obj is None:
+        #     id = 1
+        # else:
+        #     id = obj.id+1
+        certificate = Certificates(
             completed=completed,
             worker=worker,
             team=team,
@@ -479,8 +460,25 @@ def create_task():
 
 @app.route('/list/all', methods=['GET'])
 def list_all_certs():
+    sort = request.args.get('sort')
+    field_to_sort = request.args.get('field')
 
-    certificate = db.session.query(Certificates).all()
+    if sort == 'asc' and field_to_sort == 'expiration':
+        certificate = db.session.query(Certificates).order_by(Certificates.expiration_date.asc()).all()
+    elif sort == 'desc' and field_to_sort == 'expiration':
+        certificate = db.session.query(Certificates).order_by(Certificates.expiration_date.desc()).all()
+    elif sort == 'asc' and field_to_sort == 'replace':
+        certificate = db.session.query(Certificates).order_by(Certificates.has_to_be_replaced_before.asc()).all()
+    elif sort == 'desc'  and field_to_sort == 'replace':
+        certificate = db.session.query(Certificates).order_by(Certificates.has_to_be_replaced_before.desc()).all()
+    if sort == 'asc' and field_to_sort == 'worker':
+        certificate = db.session.query(Certificates).order_by(Certificates.worker.asc()).all()
+    elif sort == 'desc' and field_to_sort == 'worker':
+        certificate = db.session.query(Certificates).order_by(Certificates.worker.desc()).all()
+    else:
+        certificate = db.session.query(Certificates).all()
+
+    
     for item in certificate:
         item.completed = '' if item.completed == None else item.completed
         item.worker =  '' if item.worker == None else item.worker
@@ -506,6 +504,7 @@ def list_all_certs():
 
     return render_template('list_all.html',result=certificate)
 
+<<<<<<< HEAD
 @app.route('/search-existing-cn', methods=['POST'])
 def search_existing_cn():
     search_text = ''
@@ -522,6 +521,234 @@ def search_existing_cn():
         result = 'dont exist'
     
     return result
+=======
+def has_no_empty_params(rule):
+    defaults = rule.defaults if rule.defaults is not None else ()
+    arguments = rule.arguments if rule.arguments is not None else ()
+    return len(defaults) >= len(arguments)
+
+
+@app.route("/site-map")
+def site_map():
+    links = []
+    for rule in app.url_map.iter_rules():
+        # Filter out rules we can't navigate to in a browser
+        # and rules that require parameters
+        if "GET" in rule.methods and has_no_empty_params(rule):
+            url = url_for(rule.endpoint, **(rule.defaults or {}))
+            links.append((url, rule.endpoint))
+    # links is now a list of url, endpoint tuples
+    return render_template('site-map.html', links=links)
+
+@app.route('/upload')
+def upload_file():
+   return render_template('upload.html')
+	
+@app.route('/uploader', methods = ['GET', 'POST'])
+def uploader_file():
+   if request.method == 'POST':
+      f = request.files['file']
+      filename = secure_filename(f.filename)
+      full_file_name = os.path.join(dir_path,app.config['UPLOAD_FOLDER'],filename)
+      f.save(full_file_name)
+      if '\0' in open(full_file_name).read():
+          reader = csv.reader(x.replace('\0', '') for x in mycsv)
+      else:
+          print "No NULL bytes found"
+      flash("File uploaded successfully!","success")
+      return render_template('import-csv.html', full_file_name=full_file_name)
+
+@app.route('/import/csv', methods=['POST'])
+def import_csv():
+    data = {}
+    i = 0
+    filename = request.form['file_name']
+    try:
+        with codecs.open(filename, "rb", encoding='utf-8', errors='ignore') as f:
+            fdata = f.read().splitlines()
+            for row in fdata:
+                i += 1
+                row = row.split(',')
+                print row
+                try:
+                    data['completed'] = row[0]
+                except IndexError:
+                    data['completed'] = ''
+
+                try:
+                    data['worker'] = row[1]
+                except IndexError: 
+                    data['worker'] = ''
+
+                try:
+                    data['team'] = row[2]
+                except IndexError:
+                    data['team'] = ''
+
+                try:
+                    data['has_to_be_replaced_before'] = row[3]
+                except IndexError:
+                    data['has_to_be_replaced_before'] = ''
+
+                try:
+                    data['expiration_date'] = row[4]
+                except IndexError:
+                    data['expiration_date'] = ''
+
+                try:
+                    data['ticket_number'] = row[5]
+                except IndexError:
+                    data['ticket_number'] = ''
+
+                try:
+                    data['certificate'] = row[6]
+                except IndexError:
+                    data['certificate'] = ''
+
+                try:
+                    data['server_name'] = row[7]
+                except IndexError:
+                    data['server_name'] = ''
+
+                try:
+                    data['web_type'] = row[8]
+                except IndexError:
+                    data['web_type'] = ''
+
+                try:
+                    data['type'] = row[9]
+                except IndexError:
+                    data['type'] = ''
+
+                try:
+                    data['mail_to_co'] = row[10]
+                except IndexError:
+                    data['mail_to_co'] = ''
+
+                try:
+                    data['csr'] = row[11]
+                except IndexError:
+                    data['csr'] = ''
+
+                try:
+                    data['answer_co'] = row[12]
+                except IndexError:
+                    data['answer_co'] = ''
+
+                try:
+                    data['order_certificate'] = row[13]
+                except IndexError:
+                    data['order_certificate'] = ''
+
+                try:
+                    data['delivery_from_siemens'] = row[14]
+                except IndexError:
+                    data['delivery_from_siemens'] = ''
+
+                try:
+                    data['p12_and_zip'] = row[15]
+                except IndexError:
+                    data['p12_and_zip'] = ''
+
+                try:
+                    data['moved_to_server'] = row[16]
+                except IndexError:
+                    data['moved_to_server'] = ''
+
+                try:
+                    data['implemented'] = row[17]
+                except IndexError:
+                    data['implemented'] = ''
+
+                try:
+                    data['deleted_gm4web'] = row[18]
+                except IndexError:
+                    data['deleted_gm4web'] = ''
+
+                try:
+                    data['evidence_in_ticket'] = row[19]
+                except IndexError:
+                    data['evidence_in_ticket'] = ''
+
+                try:
+                    data['notes'] = row[20]
+                except IndexError:
+                    data['notes'] = ''
+
+                if data['has_to_be_replaced_before'] == '':
+                    data['has_to_be_replaced_before'] = None
+                else:
+                    data['has_to_be_replaced_before'] = datetime.strptime(data['has_to_be_replaced_before'], '%Y-%m-%d').date()
+
+                if data['expiration_date'] == '':
+                    data['expiration_date'] = None
+                else:
+                    data['expiration_date'] = datetime.strptime(data['expiration_date'], '%Y-%m-%d').date()
+
+                if data['mail_to_co'] == '':
+                    data['mail_to_co'] = None
+                else:
+                    data['mail_to_co'] = datetime.strptime(data['mail_to_co'], '%Y-%m-%d').date()
+
+                if data['csr'] == '':
+                    data['csr'] = None
+                else:
+                    data['csr'] = datetime.strptime(data['csr'], '%Y-%m-%d').date()
+
+                if data['answer_co'] == '':
+                    data['answer_co'] = None
+                else:
+                    data['answer_co'] = datetime.strptime(data['answer_co'], '%Y-%m-%d').date()
+
+                if data['order_certificate'] == '':
+                    data['order_certificate'] = None
+                else:
+                    data['order_certificate'] = datetime.strptime(data['order_certificate'], '%Y-%m-%d').date()
+
+                if data['delivery_from_siemens'] == '':
+                    data['delivery_from_siemens'] = None
+                else:
+                    data['delivery_from_siemens'] = datetime.strptime(data['delivery_from_siemens'], '%Y-%m-%d').date()
+
+                if data['p12_and_zip'] == '':
+                    data['p12_and_zip'] = None
+                else:
+                    data['p12_and_zip'] = datetime.strptime(data['p12_and_zip'], '%Y-%m-%d').date()
+
+                if data['moved_to_server'] == '':
+                    data['moved_to_server'] = None
+                else:
+                    data['moved_to_server'] = datetime.strptime(data['moved_to_server'], '%Y-%m-%d').date()
+
+                if data['implemented'] == '':
+                    data['implemented'] = None
+                else:
+                    data['implemented'] = datetime.strptime(data['implemented'], '%Y-%m-%d').date()
+
+                if data['deleted_gm4web'] == '':
+                    data['deleted_gm4web'] = None
+                else:
+                    data['deleted_gm4web'] = datetime.strptime(data['deleted_gm4web'], '%Y-%m-%d').date()
+
+                if data['evidence_in_ticket'] == '':
+                    data['evidence_in_ticket'] = None
+                else:
+                    data['evidence_in_ticket'] = datetime.strptime(data['evidence_in_ticket'], '%Y-%m-%d').date()
+                
+                certificate = Certificates(**data)
+                db.session.add(certificate)
+                db.session.commit()
+            
+        
+        
+    except Exception as e:
+        print "Unexpected error:", e
+        flash("Line n: " + str(i) +". Error during import: " + str(e),'error')
+        return redirect(url_for('index'))
+   
+    flash("Import successfull!",'success')
+    return redirect(url_for('index'))
+>>>>>>> 7d14c201020071a27278135dc2c65becb1cd1ec5
 
 if __name__ == '__main__':
     app.run(debug=True)
