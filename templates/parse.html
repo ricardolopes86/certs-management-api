@@ -363,9 +363,13 @@
                     type: 'POST',
                     success: function(response){
                         if(response == "exists"){
-                            confirm("This CN already exists in the Database, would you like to continue?");
+                            if (confirm("This CN already exists in the Database, would you like to continue?")){
+                                console.log("CN already exist.");
+                            }else{
+                                window.location = "/";
+                            }
                         }else{
-                            console.log('CN dont exists' + response);
+                            console.log('CN dont exists');
                         }
                     },
                     error: function(error){
