@@ -377,6 +377,29 @@
                     }
                 });
             });
+            $('form').submit(function(e){
+                console.log("form submit");
+                $.ajax({
+                    url: '/search-existing-cn',
+                    data: $('form').serialize(),
+                    type: 'POST',
+                    success: function(response){
+                        if(response == "exists"){
+                            if (confirm("This CN already exists in the Database, would you like to continue?")){
+                                $('form').submit();
+                            }else{
+                                window.location = "/";
+                            }
+                        }else{
+                            console.log("Submit form");
+                            $('form').submit();
+                        }
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });
+            });
         });
     </script>
 </body>
