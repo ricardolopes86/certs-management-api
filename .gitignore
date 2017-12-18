@@ -6,3 +6,4 @@ certificates_management.egg-info/
 dist/
 uploads/*
 certificates.db
+.scannerwork/
