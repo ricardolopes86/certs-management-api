@@ -13,7 +13,7 @@
   <!-- Bootstrap core CSS -->
   <script src="/static/js/jquery-3.2.1.slim.min.js"></script>
   <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="/static/css/datatables.min.css"/>
+  <link rel="stylesheet" type="text/css" href="/static/css/datatables.min.css" />
   <script>
     $(document).ready(function () {
       $('[data-toggle="tooltip"]').tooltip();
@@ -187,7 +187,11 @@
       return confirm('Are you sure?');
     });
     $(document).ready(function () {
-      $('#myTable2').DataTable();
+      $('#myTable2').DataTable({
+        buttons: [
+          'copy', 'excel', 'pdf'
+        ]
+      });
     });
   </script>
 </body>

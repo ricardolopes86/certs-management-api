@@ -109,8 +109,22 @@ def index():
                                     Certificates.certificate,
                                     Certificates.completed,
                                     Certificates.type).filter(Certificates.expiration_date.between(today.date(), in_a_week.date())).filter(Certificates.completed=='No').all()
-    
-    return render_template('index.html', result=certificates)
+    in_14_days = today + timedelta(days=14)
+    certificates_14_days = db.session.query(Certificates.id,
+                                    Certificates.expiration_date,
+                                    Certificates.worker,
+                                    Certificates.certificate,
+                                    Certificates.completed,
+                                    Certificates.type).filter(Certificates.expiration_date.between(today.date(), in_14_days.date())).filter(Certificates.completed=='No').all()
+    in_a_month = today + timedelta(days=30)
+    certificates_a_month = db.session.query(Certificates.id,
+                                    Certificates.expiration_date,
+                                    Certificates.worker,
+                                    Certificates.certificate,
+                                    Certificates.completed,
+                                    Certificates.type).filter(Certificates.expiration_date.between(today.date(), in_a_month.date())).filter(Certificates.completed=='No').all()
+
+    return render_template('index.html', result=certificates, result_14_days=certificates_14_days, result_30_days=certificates_a_month)
 
 def insert_db(data):
     certificate = Certificates(data['completed'],data['worker'],data['team'],data['has_to_be_replaced_before'],data['expiration_date'],data['ticket_number'],data['certificate'],data['server_name'],data['web_type'],data['type'],data['mail_to_co'],data['csr'],data['answer_co'],data['order_certificate'],data['delivery_from_siemens'],data['p12_and_zip'],data['moved_to_server'],data['implemented'],data['deleted_gm4web'],data['evidence_in_ticket'],data['notes'])
