@@ -16,7 +16,6 @@ app.secret_key = 'certificates-management'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///certificates.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-#app.config['SQLALCHEMY_ECHO'] = True
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -304,7 +303,6 @@ def search():
         if criteria == 'not_completed':
             items = db.session.query(Certificates).filter(Certificates.completed.like('No')).all()
         
-    #print items
     return render_template('search.html', result=items)
 
 @app.route('/add/new/certificate/save', methods=['POST'])
@@ -425,12 +423,6 @@ def save_new_certificate():
         type = dict['type']
         notes = dict['notes']
         
-
-        # obj = db.session.query(Certificates).order_by(Certificates.id.desc()).first()
-        # if obj is None:
-        #     id = 1
-        # else:
-        #     id = obj.id+1
         certificate = Certificates(
             completed=completed,
             worker=worker,
