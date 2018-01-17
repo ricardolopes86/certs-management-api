@@ -139,7 +139,7 @@
                             <div class="input-group">
                                 <input class="form-control" type="text" value="{{data.cn}}" id="cn" name="cn">
                                 <div class="input-group-prepend">
-                                    <button class="btn btn-outline-success" type="button" id="checkcn">
+                                    <button class="btn btn-outline-success" type="button" id="checkcn" data-toggle="tooltip" data-placement="top" title="Check if CN already exist in DB.">
                                         <i class="fa fa-search" aria-hidden="true"></i>
                                     </button>
                                 </div>
@@ -266,7 +266,7 @@
                             <div class="input-group">
                                 <input class="form-control" type="text" value="" id="cn" name="cn">
                                 <div class="input-group-prepend">
-                                    <button class="btn btn-outline-success" type="button" id="checkcn">
+                                    <button class="btn btn-outline-success" type="button" id="checkcn" data-toggle="tooltip" data-placement="top" title="Check if CN already exist in DB.">
                                         <i class="fa fa-search" aria-hidden="true"></i>
                                     </button>
                                 </div>
@@ -398,6 +398,25 @@
             </div>
         </div>
     </div>
+    <!-- Modal -->
+    <div class="modal fade" id="dontExistModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">It's OK</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h3>This CN don't exist in the database!</h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -411,35 +430,9 @@
             $('.datepicker').datepicker({
                 format: 'yyyy-mm-dd'
             });
-            $('#cn').focus();
+            $('[data-toggle="tooltip"]').tooltip();
             $('#checkcn').click(checkCn);
-            $('#cn').blur(function () {
-                var cnvalue = $('#cn').val();
-                if (cnvalue != '') {
-                    $.ajax({
-                        url: '/search-existing-cn',
-                        data: $('form').serialize(),
-                        type: 'POST',
-                        success: function (response) {
-                            if (response != 'dont exist') {
-                                var cn_actual = $("#cn").val();
-                                var exp_actual = $("#expiration_date").val();
-                                $("#cn_actual_modal").text(cn_actual);
-                                $("#exp_actual_modal").text(exp_actual);
-                                $("#cn_modal").text(response['certificate']);
-                                $("#expiration_modal").text(response['expiration-date']);
-                                $("#exampleModalCenter").modal('show');
-                            } else {
-                                console.log('CN dont exists');
-                            }
-                        },
-                        error: function (error) {
-                            console.log(error);
-                        }
-                    });
-                }
-
-            });
+            $('#cn').blur(checkCn);
             function checkCn() {
 
                 var cnvalue = $('#cn').val();
@@ -458,7 +451,7 @@
                                 $("#expiration_modal").text(response['expiration-date']);
                                 $("#exampleModalCenter").modal('show');
                             } else {
-                                console.log('CN dont exists');
+                                $("#dontExistModal").modal("show");
                             }
                         },
                         error: function (error) {
