@@ -15,7 +15,7 @@
 
     <!-- Bootstrap Date-Picker Plugin -->
     <link rel="stylesheet" href="/static/css/bootstrap-datepicker.standalone.min.css" />
-    
+
 </head>
 
 <body>
@@ -81,27 +81,25 @@
     </nav>
 
     <main role="main" class="container">
-            {% with errors = get_flashed_messages(category_filter=["success"]) %} {% if errors %}
-            <div class="alert-message block-message alert alert-success alert-dismissible fade show" role="alert">
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        {% with errors = get_flashed_messages(category_filter=["success"]) %} {% if errors %}
+        <div class="alert-message block-message alert alert-success alert-dismissible fade show" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
-              </button>
-              <ul>
+            </button>
+            <ul>
                 {%- for msg in errors %} {{ msg }} {% endfor -%}
-              </ul>
-            </div>
-            {% endif %} {% endwith %}
-            {% with errors = get_flashed_messages(category_filter=["error"]) %} {% if errors %}
-            <div class="alert-message block-message alert alert-danger alert-dismissible fade show" role="alert">
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            </ul>
+        </div>
+        {% endif %} {% endwith %} {% with errors = get_flashed_messages(category_filter=["error"]) %} {% if errors %}
+        <div class="alert-message block-message alert alert-danger alert-dismissible fade show" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
-              </button>
-              <ul>
+            </button>
+            <ul>
                 {%- for msg in errors %} {{ msg }} {% endfor -%}
-              </ul>
-            </div>
-            {% endif %} {% endwith %}
-        {% if data %}
+            </ul>
+        </div>
+        {% endif %} {% endwith %} {% if data %}
         <div class="card">
             <div class="card-body">
                 <form action="/add/new/certificate/save" method="post">
@@ -138,7 +136,14 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="cn" class="col-form-label">CN</label>
-                            <input class="form-control" type="text" value="{{data.cn}}" id="cn" name="cn">
+                            <div class="input-group">
+                                <input class="form-control" type="text" value="{{data.cn}}" id="cn" name="cn">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-success" type="button" id="checkcn">
+                                        <i class="fa fa-search" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group col-md-2">
                             <label for="type" class="col-form-label">Certificate Type</label>
@@ -258,7 +263,14 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="cn" class="col-form-label">CN</label>
-                            <input class="form-control" type="text" value="" id="cn" name="cn">
+                            <div class="input-group">
+                                <input class="form-control" type="text" value="" id="cn" name="cn">
+                                <div class="input-group-prepend">
+                                    <button class="btn btn-outline-success" type="button" id="checkcn">
+                                        <i class="fa fa-search" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group col-md-2">
                             <label for="type" class="col-form-label">Certificate Type</label>
@@ -341,8 +353,51 @@
             </div>
         </div>
         {% endif %}
-        
+
     </main>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">This CN already exist</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h4>Actual CN:</h4>
+                                <p id="cn_actual_modal" style="color: blue"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>Expiration Date:</h4>
+                                <p id="exp_actual_modal" style="color: blue"></p>
+                            </div>
+                        </div>
+                        <h5>Already in Database CN:</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <strong>CN</strong>
+                                <p id="cn_modal"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Expiration Date</strong>
+                                <p id="expiration_modal"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Continue</button>
+                    <a href="/" class="btn btn-primary">Go to Home</a>
+                    <a href="/add/new" class="btn btn-success">Add another</a>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -352,34 +407,66 @@
     <script type="text/javascript" src="/static/js/bootstrap-datepicker.min.js"></script>
     <script>
         var cn_exist;
-        $(document).ready(function(){
+        $(document).ready(function () {
             $('.datepicker').datepicker({
                 format: 'yyyy-mm-dd'
             });
             $('#cn').focus();
-            $('#cn').blur(function(){
+            $('#checkcn').click(checkCn);
+            $('#cn').blur(function () {
                 var cnvalue = $('#cn').val();
-                $.ajax({
-                    url: '/search-existing-cn',
-                    data: $('form').serialize(),
-                    type: 'POST',
-                    success: function(response){
-                        if(response == "exists"){
-                            if (confirm("This CN already exists in the Database, would you like to continue?")){
-                                cn_exist = "yes";
-                            }else{
-                                window.location = "/";
+                if (cnvalue != '') {
+                    $.ajax({
+                        url: '/search-existing-cn',
+                        data: $('form').serialize(),
+                        type: 'POST',
+                        success: function (response) {
+                            if (response != 'dont exist') {
+                                var cn_actual = $("#cn").val();
+                                var exp_actual = $("#expiration_date").val();
+                                $("#cn_actual_modal").text(cn_actual);
+                                $("#exp_actual_modal").text(exp_actual);
+                                $("#cn_modal").text(response['certificate']);
+                                $("#expiration_modal").text(response['expiration-date']);
+                                $("#exampleModalCenter").modal('show');
+                            } else {
+                                console.log('CN dont exists');
                             }
-                        }else{
-                            console.log('CN dont exists');
+                        },
+                        error: function (error) {
+                            console.log(error);
                         }
-                    },
-                    error: function(error){
-                        console.log(error);
-                    }
-                });
+                    });
+                }
+
             });
-            
+            function checkCn() {
+
+                var cnvalue = $('#cn').val();
+                if (cnvalue != '') {
+                    $.ajax({
+                        url: '/search-existing-cn',
+                        data: $('form').serialize(),
+                        type: 'POST',
+                        success: function (response) {
+                            if (response != 'dont exist') {
+                                var cn_actual = $("#cn").val();
+                                var exp_actual = $("#expiration_date").val();
+                                $("#cn_actual_modal").text(cn_actual);
+                                $("#exp_actual_modal").text(exp_actual);
+                                $("#cn_modal").text(response['certificate']);
+                                $("#expiration_modal").text(response['expiration-date']);
+                                $("#exampleModalCenter").modal('show');
+                            } else {
+                                console.log('CN dont exists');
+                            }
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            }
         });
     </script>
 </body>

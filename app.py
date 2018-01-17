@@ -515,13 +515,18 @@ def search_existing_cn():
         return result
     else:
         items = db.session.query(Certificates).filter(Certificates.certificate.like('''%'''+search_text+'''%''')).all()
-    
-    if len(items)>0:
-        result = 'exists'
+
+    if len(items):
+        result_dict = {}
+        data = [d.__dict__ for d in items]
+        result_dict['certificate'] = data[0]['certificate']
+        result_dict['expiration-date'] = data[0]['expiration_date']
+        return jsonify(result_dict)
     else:
         result = 'dont exist'
+        return result
+
     
-    return result
 
 if __name__ == '__main__':
     app.run(debug=True)
