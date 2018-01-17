@@ -520,7 +520,7 @@ def search_existing_cn():
     if search_text == '':
         return result
     else:
-        items = db.session.query(Certificates).filter(Certificates.certificate.like('''%'''+search_text+'''%''')).all()
+        items = db.session.query(Certificates).filter(Certificates.certificate.like('''%'''+search_text+'''%''')).order_by(Certificates.expiration_date.asc()).all()
 
     if len(items):
         result_dict = {}
